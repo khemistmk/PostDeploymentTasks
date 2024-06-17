@@ -71,3 +71,17 @@ function Bitlocker {
     Write-Output "Bitlocker enabled. Bitlocker key is saved to $HOME\$computername.txt"
     Write-Output "$Bitlockerkey"
 }
+
+Function SystemUpdate {
+    $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
+    if ($Manufacturer -contains "Lenovo"){
+    "C:\Setup Files\[System Update installation file name].exe" /VERYSILENT /NORESTART
+    }
+    elseif ($manufacturer -contains "HP"){
+    #grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
+
+    hp-hpia-5.2.1.exe /s
+    cd C:\\SWSetup\\SP140024
+    HPImageAssistant.exe /Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent
+    }
+}
