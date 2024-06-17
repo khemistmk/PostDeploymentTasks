@@ -15,6 +15,11 @@
 # * uninstall SmartDeploy
 # * remove Deployment folders
 
+#Update the following paths as needed
+#System Update file location
+$systemupdate = "C:\Setup Files\System_update.exe"
+#Ninite file location
+$ninite = "C:\Setup Files\AppInstaller32.exe" /silent
 
 
 Function Infoheader {
@@ -94,6 +99,6 @@ Function SystemUpdate {
 }
 
 Function Ninite {
-    "c:\Setup Files\AppInstaller32.exe" /silent
+    Invoke-Expression $ninite
 }
 
