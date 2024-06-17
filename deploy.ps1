@@ -4,7 +4,7 @@
 # ---------------------------
 #
 #This script will perform the following actions under the default profile:
-# * Disabled built in Administrator account
+# * Disable built in Administrator account
 # * check and Set computer name to serial number
 # * check activation and activate windows based on OEM bios key
 # * install and run System Update if Lenovo, HP Image assistant if HP
@@ -46,6 +46,21 @@ Function MainMenu {
     Write-Host "---------------------------" 
     $Deploy = Read-Host "Please make a selection"
   }
+
+Function Default {
+    Write-Host "This script will perform the following actions under the default profile:"
+    Write-Host "* Disable built in Administrator account"
+    Write-Host "* check and Set computer name to serial number"
+    Write-Host "* check activation and activate windows based on OEM bios key"
+    Write-Host "* install and run System Update if Lenovo, HP Image assistant if HP"
+    Write-Host "* run windows updates"
+    Write-Host "* run Ninite to install Chrome, Firefox, and VLC"
+    Write-Host "* activate bitlocker and print bitlocker key to file"
+    Write-Host "* install .Net 3.5"
+    Write-Host "* configure power plan: On Battery (screen off: 30min, sleep: never), Plugged in (screen off: 1 hr, sleep: never)"
+    Write-Host "* uninstall SmartDeploy"
+    Write-Host "* remove Deployment folders"
+}
 
 #Installation and changes
 Function ComputerName {
@@ -110,10 +125,9 @@ Function SystemUpdate {
     Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM -search R -action INSTALL -nolicense -IncludeRebootPackages 1,3,4"
     }
     elseif ($manufacturer -contains "HP"){
-    #grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
-    hp-hpia-5.2.1.exe /s
-    cd C:\\SWSetup\\SP140024
-    HPImageAssistant.exe /Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent
+    $HPIA
+    Set-Location -FilePath "C:\SWSetup\SP140024"
+    Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
     }
 }
 
@@ -122,18 +136,36 @@ Function Ninite {
 }
 
 Function RMDeployfiles {
-    del "C:\OEM"
+    del "C:\OEM" 
     del "C:\Platform"
 }
 
+Function SmartDeploy {
+    $Installer = New-Object -ComObject WindowsInstaller.Installer 
+    $InstallerProducts = $Installer.ProductsEx("", "", 7)
+    $InstalledProducts = ForEach($Product in $InstallerProducts){[PSCustomObject]@{ProductCode = $Product.ProductCode()
+    $LocalPackage = $Product.InstallProperty("LocalPackage"); VersionString = $Product.InstallProperty("VersionString"); ProductPath = $Product.InstallProperty("ProductName")}} $InstalledProducts
+
+    Start-Process MsiExec.exe -ArgumentList "/X{77753FDC-5039-4F18-B37C-E86B7EF921A9}"
+}
+
+Infoheader
+MainMenu
+
 Function Deployment {
-    WinActivation
-    ComputerName
-    DotNet3
-    Ninite
-    SystemUpdate
-    windowsupdate
-    Bitlocker
+    switch ($Deploy) {
+        '1'{ 
+            WinActivation
+            ComputerName
+            DotNet3
+            Ninite
+            SystemUpdate
+            windowsupdate
+            Bitlocker
+         }
+        
+    }
+   
     
 }
 
