@@ -1,5 +1,5 @@
-# Deployment Script
-# by khemist
+# Post-Deployment Script
+# by Timothy Wilson
 #
 # ---------------------------
 #
@@ -17,18 +17,21 @@
 
 #Update the following paths as needed
 #System Update file location
-$systemupdate = "C:\Setup Files\System_update.exe"
+$systemupdate = "C:\Setup Files\System_update.exe" /VERYSILENT /NORESTART
 #Ninite file location
-$ninite = "C:\Setup Files\AppInstaller32.exe" /silent
+$ninite = "C:\Setup Files\AppInstaller32.exe /silent"
 
-
+#Structure
 Function Infoheader {
   Write-Host "---------------------------"
   Write-Host ""
-  Write-Host "     Deployment Script v0.1     "
+  Write-Host "     Post-Deployment Script v0.1     "
+  Write-Host ""
   Write-Host "---------------------------" 
-  }
+}
 
+
+#Installation and changes
 Function ComputerName {
     $serialnumber = wmic bios get serialnumber
     $computername = hostname
@@ -36,12 +39,23 @@ Function ComputerName {
         return
     }
     else {
-        
-$product key = wmic path softwarelicensingservice get OA3OriginalProductKey
+        Set-ComputerName $hostname-1
+    }
+}
 
-$cpuInfo = Get-CimInstance -ClassName Win32_Processor
+Function WinActivation {
+    $OEMproductkey = wmic path softwarelicensingservice get OA3OriginalProductKey
+    $activationstatus = cscript c:\windows\system32\slmgr.vbs /xpr
+    if (($activationstatus -contains "permanently activated")){
+        return
+    }
+    else {
+        slmgr /ipk $OEMproductkey
+    }
+}
 
-$cpuname = $cpuInfo.Name
+
+
 
 Function Get-OSName
 {
@@ -91,7 +105,6 @@ Function SystemUpdate {
     }
     elseif ($manufacturer -contains "HP"){
     #grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
-
     hp-hpia-5.2.1.exe /s
     cd C:\\SWSetup\\SP140024
     HPImageAssistant.exe /Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent
@@ -102,3 +115,6 @@ Function Ninite {
     Invoke-Expression $ninite
 }
 
+$cpuInfo = Get-CimInstance -ClassName Win32_Processor
+
+$cpuname = $cpuInfo.Name
