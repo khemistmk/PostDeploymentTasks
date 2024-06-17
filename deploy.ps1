@@ -4,6 +4,7 @@
 # ---------------------------
 #
 #This script will perform the following actions under the default profile:
+# * Disabled built in Administrator account
 # * check and Set computer name to serial number
 # * check activation and activate windows based on OEM bios key
 # * install and run System Update if Lenovo
@@ -23,8 +24,14 @@ Function Infoheader {
   Write-Host "---------------------------" 
   }
 
-
-$serialnumber = wmic bios get serialnumber
+Function ComputerName {
+    $serialnumber = wmic bios get serialnumber
+    $computername = hostname
+    if ( $computername = $hostname ){
+        return
+    }
+    else {
+        
 $product key = wmic path softwarelicensingservice get OA3OriginalProductKey
 
 $cpuInfo = Get-CimInstance -ClassName Win32_Processor
@@ -85,3 +92,8 @@ Function SystemUpdate {
     HPImageAssistant.exe /Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent
     }
 }
+
+Function Ninite {
+    "c:\Setup Files\AppInstaller32.exe" /silent
+}
+
