@@ -36,3 +36,17 @@ Function Get-OSName
    $osversion = (Get-WmiObject Win32_OperatingSystem).Caption
    write-output "$osversion"
 }
+
+Function windowsupdate {
+    # Install the Windows Update module
+    Install-Module -Name PSWindowsUpdate -Force
+
+    # Import the Windows Update module
+    Import-Module PSWindowsUpdate
+
+    # Check for updates
+    Get-WindowsUpdate -AcceptAll -Install -AutoReboot
+    Uninstall-Module -Name PSWindowsUpdate -Force
+    # Restart the system if updates require a reboot
+    Restart-Computer -Force
+}
