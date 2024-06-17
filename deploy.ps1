@@ -7,19 +7,25 @@
 # * Disabled built in Administrator account
 # * check and Set computer name to serial number
 # * check activation and activate windows based on OEM bios key
-# * install and run System Update if Lenovo
+# * install and run System Update if Lenovo, HP Image assistant if HP
 # * run windows updates
 # * run Ninite to install Chrome, Firefox, and VLC
 # * activate bitlocker and print bitlocker key to file
 # * install .Net 3.5
+# * configure power plan: On Battery (screen off: 30min, sleep: never), Plugged in (screen off: 1 hr, sleep: never)
 # * uninstall SmartDeploy
 # * remove Deployment folders
 
 #Update the following paths as needed
 #System Update file location
-$systemupdate = "C:\Setup Files\System_update.exe" /VERYSILENT /NORESTART
+$systemupdate = Start-Process -FilePath "C:\Setup Files\System Update.exe" -ArgumentList "/VERYSILENT /NORESTART"
+
+#HP Imaging Assistant file location
+#grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
+$HPIA = Start-Process -Filepath "C:\Setup Files\hp-hpia-5.2.1.exe" -ArgumentList "/s"
+
 #Ninite file location
-$ninite = "C:\Setup Files\AppInstaller32.exe /silent"
+$ninite =  Start-Process "C:\Setup Files\AppInstaller32.exe"
 
 #Structure
 Function Infoheader {
@@ -30,16 +36,26 @@ Function Infoheader {
   Write-Host "---------------------------" 
 }
 
+#Menu
+Function MainMenu {
+    Write-Host "---------------------------"
+    Write-Host ""
+    Write-Host " (0) Default Deployment (No Office, No PDF)"
+    Write-Host " (1) Custom Deployment"
+    Write-Host ""
+    Write-Host "---------------------------" 
+    $Deploy = Read-Host "Please make a selection"
+  }
 
 #Installation and changes
 Function ComputerName {
-    $serialnumber = wmic bios get serialnumber
+    $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
     $computername = hostname
     if ( $computername = $hostname ){
         return
     }
     else {
-        Set-ComputerName $hostname-1
+        Rename-Computer -newname "$computername"
     }
 }
 
@@ -54,24 +70,13 @@ Function WinActivation {
     }
 }
 
-
-
-
-Function Get-OSName
-{
-   $osversion = (Get-WmiObject Win32_OperatingSystem).Caption
-   write-output "$osversion"
-}
-
 Function windowsupdate {
     # Install the Windows Update module
     Install-Module -Name PSWindowsUpdate -Force
-
     # Import the Windows Update module
     Import-Module PSWindowsUpdate
-
     # Check for updates
-    Get-WindowsUpdate -AcceptAll -Install -AutoReboot
+    Start-Process (Get-WindowsUpdate -AcceptAll -Install -AutoReboot)
     Uninstall-Module -Name PSWindowsUpdate -Force
     # Restart the system if updates require a reboot
     Restart-Computer -Force
@@ -86,7 +91,7 @@ function DotNet3 {
 
 function Bitlocker {
     #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
-    if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq FullyEncrypted) {
+    if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq 'FullyEncrypted') {
         Write-Host "[*] Bitlocker is already enabled for Drive C:"
     }
     else {
@@ -101,7 +106,8 @@ function Bitlocker {
 Function SystemUpdate {
     $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
     if ($Manufacturer -contains "Lenovo"){
-    "C:\Setup Files\[System Update installation file name].exe" /VERYSILENT /NORESTART
+    $systemupdate
+    Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM -search R -action INSTALL -nolicense -IncludeRebootPackages 1,3,4"
     }
     elseif ($manufacturer -contains "HP"){
     #grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
@@ -112,9 +118,34 @@ Function SystemUpdate {
 }
 
 Function Ninite {
-    Invoke-Expression $ninite
+    $Ninite
+}
+
+Function RMDeployfiles {
+    del "C:\OEM"
+    del "C:\Platform"
+}
+
+Function Deployment {
+    WinActivation
+    ComputerName
+    DotNet3
+    Ninite
+    SystemUpdate
+    windowsupdate
+    Bitlocker
+    
 }
 
 $cpuInfo = Get-CimInstance -ClassName Win32_Processor
 
 $cpuname = $cpuInfo.Name
+
+
+
+
+Function Get-OSName
+{
+   $osversion = (Get-WmiObject Win32_OperatingSystem).Caption
+   write-output "$osversion"
+}
