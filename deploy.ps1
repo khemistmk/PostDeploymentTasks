@@ -137,7 +137,7 @@ Function SystemUpdate {
 Function Ninite {
     Start-Process -Filepath $Ninite
 }
-cd 
+
 Function RMDeployfiles {
     del "C:\OEM" 
     del "C:\Platform"
