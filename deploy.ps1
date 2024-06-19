@@ -1,9 +1,10 @@
+###############################
 # Post-Deployment Script
 # by Timothy Wilson
-#
+###############################
 # ---------------------------
 #
-#This script will perform the following actions under the default profile:
+#   This script will perform the following actions under the default profile:
 # * Disable built in Administrator account
 # * check and Set computer name to serial number
 # * check activation and activate windows based on OEM bios key
@@ -16,16 +17,17 @@
 # * uninstall SmartDeploy
 # * remove Deployment folders
 
-#Update the following paths as needed
+####Update the following paths as needed####
 #System Update file location
-$systemupdate = Start-Process -FilePath "C:\Setup Files\System Update.exe" -ArgumentList "/VERYSILENT /NORESTART"
+$systemupdate = "C:\Setup Files\System Update.exe"
 
 #HP Imaging Assistant file location
 #grab latest from http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html](http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html
-$HPIA = Start-Process -Filepath "C:\Setup Files\hp-hpia-5.2.1.exe" -ArgumentList "/s"
+$HPIA = "C:\Setup Files\hp-hpia-5.2.1.exe"
 
 #Ninite file location
-$ninite =  Start-Process "C:\Setup Files\AppInstaller32.exe"
+$ninite = "C:\Setup Files\AppInstaller32.exe"
+############################################
 
 #Structure
 Function Infoheader {
@@ -121,20 +123,21 @@ function Bitlocker {
 Function SystemUpdate {
     $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
     if ($Manufacturer -contains "Lenovo"){
-    $systemupdate
+    Start-Process -FilePath $systemupdate -ArgumentList "/VERYSILENT /NORESTART"
+
     Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM -search R -action INSTALL -nolicense -IncludeRebootPackages 1,3,4"
     }
     elseif ($manufacturer -contains "HP"){
-    $HPIA
+    Start-Process -Filepath $HPIA -ArgumentList "/s"
     Set-Location -FilePath "C:\SWSetup\SP140024"
     Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
     }
 }
 
 Function Ninite {
-    $Ninite
+    Start-Process -Filepath $Ninite
 }
-
+cd 
 Function RMDeployfiles {
     del "C:\OEM" 
     del "C:\Platform"
@@ -152,6 +155,9 @@ Function SmartDeploy {
 Infoheader
 MainMenu
 
+if ($deploy -eq '0'){
+
+}
 Function Deployment {
     switch ($Deploy) {
         '1'{ 
