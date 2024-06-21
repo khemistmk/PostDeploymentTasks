@@ -64,6 +64,28 @@ Function Default {
     Write-Host "* remove Deployment folders"
 }
 
+function Custom {
+    Write-Host "---------------------------"
+    Write-Host ""
+    Write-Host " Select Office Version"
+    Write-Host "    (1) Office 365"
+    Write-Host "    (2) Office HBE 2021"
+    Write-Host ""
+    Write-Host "---------------------------" 
+    $Office = Read-Host "Please make a selection"    
+    clear
+    Write-Host "---------------------------"
+    Write-Host ""
+    Write-Host " Select PDF Version"
+    Write-Host "    (1) Adobe STD 2020"
+    Write-Host "    (2) Adobe PRO 2020"
+    Write-Host "    (2) Foxit Business"
+    Write-Host ""
+    Write-Host "---------------------------" 
+    $Office = Read-Host "Please make a selection"    
+    clear
+}
+
 #Installation and changes
 Function ComputerName {
     $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
@@ -156,24 +178,16 @@ Infoheader
 MainMenu
 
 if ($deploy -eq '0'){
+    WinActivation
+    ComputerName
+    DotNet3
+    Ninite
+    SystemUpdate
+    windowsupdate
+    Bitlocker
 
 }
-Function Deployment {
-    switch ($Deploy) {
-        '1'{ 
-            WinActivation
-            ComputerName
-            DotNet3
-            Ninite
-            SystemUpdate
-            windowsupdate
-            Bitlocker
-         }
-        
-    }
-   
-    
-}
+else { Custom}
 
 $cpuInfo = Get-CimInstance -ClassName Win32_Processor
 
