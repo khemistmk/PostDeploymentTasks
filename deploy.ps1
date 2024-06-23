@@ -35,10 +35,10 @@ $HPIA = "hp-hpia-5.2.1.exe"
 $ninite = "AppInstaller32.exe"
 
 ############################################
-clear
+Clear-Host
 #Structure
 Function Header {
-    clear
+    Clear-Host
   Write-Host "---------------------------"
   Write-Host ""
   Write-Host "Post-Deployment Script v0.1"
@@ -55,10 +55,10 @@ Function MainMenu {
     Write-Host " (q) Quit"
     Write-Host ""
     Write-Host "---------------------------" 
-    $Deploy = Read-Host "Please make a selection"
-  }
+    $Mainmenuselect = Read-Host "Please make a selection"
+}
 
-Function InfoText {
+Function Defaulttext {
     clear
     Header
     Write-Host "This script will perform the following actions under the default profile:"
@@ -73,7 +73,7 @@ Function InfoText {
     Write-Host "* configure power plan: On Battery (screen off: 30min, sleep: never), Plugged in (screen off: 1 hr, sleep: never)"
     Write-Host "* uninstall SmartDeploy"
     Write-Host "* remove Deployment folders"
-    $Default = Read-Host " Press (1) to Deploy. Press (q) to quit"
+    $Defaultselect = Read-Host " Press (1) to Deploy. Press (q) to quit"
 }
 
 function Custom {
@@ -99,10 +99,24 @@ function Custom {
     Write-Host "---------------------------" 
     $PDF = Read-Host "Please make a selection"  
     
-    if ($Office -eq '1') {
-        $officedeploy = "$deployroot\MS Office\Office 365\Setup32.exe"
+    switch ($Office) {
+        '1' {
+            $officedeploy = "$deployroot\MS Office\Office 365\Setup32.exe"
+        }
+        '2' {
+            $officedeploy = "$deployroot\MS Office\Office 2021\Setup32.exe"
+        }
+        
     }
-    
+    switch ($PDF) {
+        '1' {
+            $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe STD 2020\Setup.exe"
+        }
+        '2' {
+            $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe PRO 2020\Setup.exe"
+        }
+        
+    }    
 }
 
 Function Customtext {
@@ -123,9 +137,15 @@ Function Customtext {
     if ($Office -eq '1') {
         Write-Host "* Install Microsoft 365 Apps"
     }
+    elseif ($Office -eq '2') {
+        Write-Host "* Install Microsoft HBE 2021 Apps"
+    }
     else {Write-Host "No Office Apps Deployed"}
     if ($PDF -eq '1') {
         Write-Host "* Install Adobe STD 2020"
+    }
+    elseif ($PDF -eq '2') {
+        Write-Host "* Install Adobe PRO 2020"
     }
     else {Write-Host "No PDF Apps Deployed"}
     $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit"
@@ -168,14 +188,12 @@ Function windowsupdate {
     # Restart the system if updates require a reboot
     Restart-Computer -Force
 }
-
 function DotNet3 {
     #Enables .Net 3.5
     Write-Host "[*] Enabling .Net 3.5" -ForegroundColor Green
     DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
     Write-Host "[*] .Net 3.5 Enabled"
 }
-
 function Bitlocker {
     #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
     if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq 'FullyEncrypted') {
@@ -189,7 +207,6 @@ function Bitlocker {
     Write-Output "Bitlocker enabled. Bitlocker key is saved to $HOME\$computername.txt"
     Write-Output "$Bitlockerkey"
 }
- 
 Function SystemUpdate {
     $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
     if ($Manufacturer -contains "Lenovo"){
@@ -202,16 +219,13 @@ Function SystemUpdate {
     Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
     }
 }
-
 Function Ninite {
     Start-Process -Filepath "$scriptroot\$Ninite"
 }
-
 Function RMDeployfiles {
     del "C:\OEM" 
     del "C:\Platform"
 }
-
 Function SmartDeploy {
     $Installer = New-Object -ComObject WindowsInstaller.Installer 
     $InstallerProducts = $Installer.ProductsEx("", "", 7)
@@ -222,39 +236,39 @@ Function SmartDeploy {
 }
 
 Function Defaultdeploy {
-    WinActivation
-    ComputerName
-    DotNet3
-    Ninite
-    RMDeployfiles
-    SmartDeploy
-    SystemUpdate
-    windowsupdate
-    Bitlocker
-}
-Infoheader
-MainMenu
-
-switch ($Deploy){
-    '0' {
-        $info = InfoText
-    }
-    '1' {
-        $info = Custom
-    }
-
+    Write-Host "Activating Windows"
+    Start-Process WinActivation
+    Start-Process ComputerName
+    Start-Process DotNet3
+    Start-Process Ninite
+    Start-Process RMDeployfiles
+    Start-Process SmartDeploy
+    Start-Process SystemUpdate -wait
+    Start-Process windowsupdate -wait
+    Start-Process Bitlocker
 }
 
-$info
-
-switch ($Default){
-    '0' {
-        DefaultDeploy
-    }
-    '1' {
-        Defaultdeploy
-        MSOffice
-        PDF
-    }
-
+Function Customdeploy {
+    Start-Process DefaultDeploy
+    Start-Process -FilePath $officedeploy
+    Start-Process -FilePath $PDF
 }
+
+Do {
+    if ($Mainmenuselect -eq '0') {
+        InfoText
+    }
+    else { 
+        Custom
+        Clear-Host
+        Do {
+            Customtext
+            if ($Customdeploy -eq '1') {
+                Customdeploy
+            }
+        }
+        until ($Customdeploy -eq 'q')
+    }
+}
+until (($Mainmenuselect -eq 'q') -or ($Defaultselect -eq 'q'))
+Exit
