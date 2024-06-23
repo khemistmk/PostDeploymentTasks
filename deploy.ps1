@@ -123,11 +123,11 @@ Function Customtext {
     if ($Office -eq '1') {
         Write-Host "* Install Microsoft 365 Apps"
     }
-    else (Write-Host "No Office Apps Deployed")
+    else {Write-Host "No Office Apps Deployed"}
     if ($PDF -eq '1') {
         Write-Host "* Install Adobe STD 2020"
     }
-    else (Write-Host "No PDF Apps Deployed")
+    else {Write-Host "No PDF Apps Deployed"}
     $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit"
 }
 
@@ -235,19 +235,21 @@ Function Defaultdeploy {
 Infoheader
 MainMenu
 
-switch ($deploy){
+switch ($Deploy){
     '0' {
-        InfoText
+        $info = InfoText
     }
     '1' {
-        Custom
+        $info = Custom
     }
 
 }
 
+$info
+
 switch ($Default){
     '0' {
-        InfoText
+        DefaultDeploy
     }
     '1' {
         Defaultdeploy
@@ -255,17 +257,4 @@ switch ($Default){
         PDF
     }
 
-}
-
-$cpuInfo = Get-CimInstance -ClassName Win32_Processor
-
-$cpuname = $cpuInfo.Name
-
-
-
-
-Function Get-OSName
-{
-   $osversion = (Get-WmiObject Win32_OperatingSystem).Caption
-   write-output "$osversion"
 }
