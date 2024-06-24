@@ -134,65 +134,114 @@ Function Customtext {
 
 #Installation and changes
 Function ComputerName {
+    Write-Host "[*] Setting Computer name..." -ForegroundColor Yellow
     $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
     $computername = hostname
     if ( $computername = $hostname ){
         return
     }
     else {
-        Rename-Computer -newname "$computername"
+        Rename-Computer -newname "$serialnumber"
     }
+    Write-Host "[*] Computer name set to $computername" -ForegroundColor Green
 }
 function DisableAdmin {
+    Write-Host "[*] Checking default Administrator Account..." -ForegroundColor Yellow
+    $adminaccount = Get-LocalUser -Name Administrator
+    if ($adminaccount.Enabled -eq "False") {
+    Write-Host "[*] Disabling default Administrator Account..."-ForegroundColor Yellow
     Start-Process -FilePath "$scriptroot\$disableadmin"
-    
+    Write-Host "[*] Administrator account disabled." -ForegroundColor Green
+    }
 }
 Function WinActivation {
+    Write-Host "[*] Checking Windows Activation..." -ForegroundColor Yellow
     $OEMproductkey = wmic path softwarelicensingservice get OA3OriginalProductKey
     $activationstatus = cscript c:\windows\system32\slmgr.vbs /xpr
     if (($activationstatus -contains "permanently activated")){
+        Write-Host "Windows is Permanently Activated" -ForegroundColor Green
         return
     }
     else {
+        Write-Host "[*] Windows not yet activated." -ForegroundColor Yellow
         slmgr /ipk $OEMproductkey
+        Write-Host "[*] Activating Windows..." -ForegroundColor Green
+        if (($activationstatus -contains "permanently activated")){
+            Write-Host "Windows is Permanently Activated" -ForegroundColor Green
+            return
+        }
+        else {
+            Write-Error -Message "[*] Windows failed to activate..." 
+        }
     }
 }
 
 Function windowsupdate {
     # Install the Windows Update module
+    Write-Host "[*] Getting ready to update Windows..." -ForegroundColor Yellow
     Install-Module -Name PSWindowsUpdate -Force
     # Import the Windows Update module
     Import-Module PSWindowsUpdate
     # Check for updates
+    Write-Host "[*] Running Windows Updates..." -ForegroundColor Yellow
     Start-Process (Get-WindowsUpdate -AcceptAll -Install -AutoReboot)
     Uninstall-Module -Name PSWindowsUpdate -Force
+    Write-Host "[*] Windows Updates completed." -ForegroundColor Green
     # Restart the system if updates require a reboot
+    Write-Host "[*] Restarting Windows..." -ForegroundColor Red
     Restart-Computer -Force
 }
 function DotNet3 {
     #Enables .Net 3.5
-    Write-Host "[*] Enabling .Net 3.5" -ForegroundColor Green
-    DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
-    Write-Host "[*] .Net 3.5 Enabled"
+    Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
+    $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
+    if ($dotnet3 -eq 'True') {
+        Write-Host "[*] .Net 3.5 Enabled" -ForegroundColor Green
+    }
+    else {
+        Write-Host "[*] Enabling .Net 3.5" -ForegroundColor Yellow
+        DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+        Write-Host "[*] .Net 3.5 Enabled" -ForegroundColor Green
+    }
+    Write-Host "[*] Checking .Net 4.8 Status..." -ForegroundColor Yellow
+    $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 4 -and $_.Minor -eq 8}).Count -ge 1
+    if ($dotnet3 -eq 'True') {
+        Write-Host "[*] .Net 4.8 Enabled" -ForegroundColor Green
+    }
 }
 function Bitlocker {
     #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
+    Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
     if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq 'FullyEncrypted') {
-        Write-Host "[*] Bitlocker is already enabled for Drive C:"
+        Write-Host "[*] Bitlocker is already enabled for Drive C:" -ForegroundColor Green
     }
     else {
+        Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
         Enable-Bitlocker -MountPoint C -UsedSpaceOnly -RecoveryPassword
     }
     $Bitlockerkey = (Get-BitLockerVolume -MountPoint C).KeyProtector | Where-Object -Property KeyProtectorType -eq RecoveryPassword | Select-Object -Property KeyProtectorID,RecoveryPassword 
-    $Bitlockerkey > "$HOME\$computername.txt"
-    Write-Output "Bitlocker enabled. Bitlocker key is saved to $HOME\$computername.txt"
-    Write-Output "$Bitlockerkey"
+    $Bitlockerkey > "$scriptroot\$computername.txt"
+    Write-Host "Bitlocker enabled. Bitlocker key is saved to $scriptroot\$computername.txt" -ForegroundColor Green
+    Write-Host "$Bitlockerkey" -ForegroundColor Yellow
 }
 Function SystemUpdate {
+    Write-Host "[*] Checking manufacturer..." -ForegroundColor Yellow
     $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
     if ($Manufacturer -contains "Lenovo"){
+    Write-Host "[*] Installing Lenovo System Update..." -ForegroundColor Yellow
     Start-Process -FilePath "$scriptroot\$systemupdate" -ArgumentList "/VERYSILENT /NORESTART" -Wait
-    Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM -search R -action INSTALL -nolicense -IncludeRebootPackages 1,3,4"
+    $RegKey = "HKLM:\SOFTWARE\Policies\Lenovo\System Update\UserSettings\General"
+    $RegName = "AdminCommandLine"
+    $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -noreboot -exporttowmi"    
+    # Create Subkeys if they don't exist
+    if (!(Test-Path $RegKey)) {
+    New-Item -Path $RegKey -Force | Out-Null
+    New-ItemProperty -Path $RegKey -Name $RegName -Value $RegValue | Out-Null
+    }
+    else {
+    New-ItemProperty -Path $RegKey -Name $RegName -Value $RegValue -Force | Out-Null
+    } 
+    Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM"
     }
     elseif ($manufacturer -contains "HP"){
     Start-Process -Filepath "$scriptroot\$HPIA" -ArgumentList "/s"
@@ -204,29 +253,44 @@ Function Ninite {
     Start-Process -Filepath "$scriptroot\$Ninite"
 }
 Function RMDeployfiles {
-    del "C:\OEM" 
-    del "C:\Platform"
+    Write-Host "[*] Removing OEM and Platform folders..." -ForegroundColor Yellow
+    $oem = "C:\OEM"
+    $platform = "C:\Platform"
+    if (Test-Path -Path $oem) {
+        Remove-Item -LiteralPath $oem -Force -Recurse
+        Write-Host "[*] OEM folder removed." -ForegroundColor Green
+    }
+    else {
+        Write-Host "[*] OEM folder removed." -ForegroundColor Green
+    }
+    if (Test-Path -Path $platform) {
+        Remove-Item -LiteralPath "C:\Platform" -Force -Recurse
+        Write-Host "[*] Platform folder removed." -ForegroundColor Green
+    }
+    else {
+        Write-Host "[*] Platform folder removed." -ForegroundColor Green
+    }
 }
 Function SmartDeploy {
+    Write-Host "[*] Uninstalling Smart Deploy..." -ForegroundColor Yellow
     $Installer = New-Object -ComObject WindowsInstaller.Installer 
     $InstallerProducts = $Installer.ProductsEx("", "", 7)
     $InstalledProducts = ForEach($Product in $InstallerProducts){[PSCustomObject]@{ProductCode = $Product.ProductCode()
     $LocalPackage = $Product.InstallProperty("LocalPackage"); VersionString = $Product.InstallProperty("VersionString"); ProductPath = $Product.InstallProperty("ProductName")}} $InstalledProducts
-
-    Start-Process MsiExec.exe -ArgumentList "/X{77753FDC-5039-4F18-B37C-E86B7EF921A9}"
+    Start-Process MsiExec.exe -ArgumentList "/X{77753FDC-5039-4F18-B37C-E86B7EF921A9}" -Wait
+    Write-Host "[*] Smart Deploy Uninstalled" -ForegroundColor Green
 }
 
 Function Defaultdeploy {
-    Write-Host "Activating Windows"
-    Start-Process WinActivation
-    Start-Process ComputerName
-    Start-Process DotNet3
-    Start-Process Ninite
-    Start-Process RMDeployfiles
-    Start-Process SmartDeploy
-    Start-Process SystemUpdate -wait
-    Start-Process windowsupdate -wait
-    Start-Process Bitlocker
+    WinActivation
+    ComputerName
+    DotNet3
+    Ninite
+    RMDeployfiles
+    SmartDeploy
+    SystemUpdate
+    windowsupdate
+    Bitlocker
 }
 
 Function Customdeploy {
@@ -247,6 +311,7 @@ Do {
             }
             if ($Defaultselect -eq 'q') {
                 Exit
+            }
         }
         '1' {     
             CustomOffice
@@ -277,8 +342,10 @@ Do {
             if ($Customdeploy -eq 'q') {
                 Exit
         }
+        }
         'q' {
             Return
+        }
     }
     Pause
 }
