@@ -74,10 +74,9 @@ Function Defaulttext {
     Write-Host "* configure power plan: On Battery (screen off: 30min, sleep: never), Plugged in (screen off: 1 hr, sleep: never)"
     Write-Host "* uninstall SmartDeploy"
     Write-Host "* remove Deployment folders"
-    $Defaultselect = Read-Host " Press (1) to Deploy. Press (q) to quit"
 }
 
-function Custommenu {
+function Customoffice {
     Clear-Host
     Header
     Write-Host "---------------------------"
@@ -86,8 +85,10 @@ function Custommenu {
     Write-Host "    (1) Office 365"
     Write-Host "    (2) Office HBE 2021"
     Write-Host ""
-    Write-Host "---------------------------" 
-    $Office = Read-Host "Please make a selection"    
+    Write-Host "---------------------------"
+}
+
+Function CustomPDF {    
     Clear-Host
     Header
     Write-Host "---------------------------"
@@ -98,26 +99,6 @@ function Custommenu {
     Write-Host "    (2) Foxit Business"
     Write-Host ""
     Write-Host "---------------------------" 
-    $PDF = Read-Host "Please make a selection"  
-    
-    switch ($Office) {
-        '1' {
-            $officedeploy = "$deployroot\MS Office\Office 365\Setup32.exe"
-        }
-        '2' {
-            $officedeploy = "$deployroot\MS Office\Office 2021\Setup32.exe"
-        }
-        
-    }
-    switch ($PDF) {
-        '1' {
-            $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe STD 2020\Setup.exe"
-        }
-        '2' {
-            $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe PRO 2020\Setup.exe"
-        }
-        
-    }    
 }
 
 Function Customtext {
@@ -149,7 +130,6 @@ Function Customtext {
         Write-Host "* Install Adobe PRO 2020"
     }
     else {Write-Host "No PDF Apps Deployed"}
-    $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit"
 }
 
 #Installation and changes
@@ -261,6 +241,7 @@ Do {
     Switch ($Mainmenuselect) {
         '0' {
             DefaultText
+            $Defaultselect = Read-Host " Press (1) to Deploy. Press (q) to quit"
             if ($Defaultselect -eq '1') {
                 Defaultdeploy
             }
@@ -268,8 +249,28 @@ Do {
                 Exit
         }
         '1' {     
-            Custommenu
+            CustomOffice
+            $Office = Read-Host "Please make a selection"
+            switch ($Office) {
+                '1' {
+                    $officedeploy = "$deployroot\MS Office\Office 365\Setup32.exe"
+                 }
+                '2' {
+                    $officedeploy = "$deployroot\MS Office\Office 2021\Setup32.exe"
+                } 
+            }
+            CustomPDF
+            $PDF = Read-Host "Please make a selection"
+            switch ($PDF) {
+                '1' {
+                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe STD 2020\Setup.exe"
+                }
+                '2' {
+                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe PRO 2020\Setup.exe"
+                }        
+            }    
             Customtext
+            $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit
             if ($Customdeploy -eq '1') {
                 Customdeploy
             }
