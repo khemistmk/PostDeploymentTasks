@@ -39,15 +39,17 @@ Clear-Host
 #Structure
 Function Header {
     Clear-Host
-  Write-Host "---------------------------"
-  Write-Host ""
-  Write-Host "Post-Deployment Script v0.1"
-  Write-Host ""
-  Write-Host "---------------------------" 
+    Write-Host "---------------------------"
+    Write-Host ""
+    Write-Host "Post-Deployment Script v0.1"
+    Write-Host ""
+    Write-Host "---------------------------" 
 }
 
 #Menu
 Function MainMenu {
+    Clear-Host
+    Header 
     Write-Host "---------------------------"
     Write-Host ""
     Write-Host " (0) Default Deployment (No Office, No PDF)"
@@ -55,11 +57,10 @@ Function MainMenu {
     Write-Host " (q) Quit"
     Write-Host ""
     Write-Host "---------------------------" 
-    $Mainmenuselect = Read-Host "Please make a selection"
 }
 
 Function Defaulttext {
-    clear
+    Clear-Host
     Header
     Write-Host "This script will perform the following actions under the default profile:"
     Write-Host "* Disable built in Administrator account"
@@ -76,8 +77,8 @@ Function Defaulttext {
     $Defaultselect = Read-Host " Press (1) to Deploy. Press (q) to quit"
 }
 
-function Custom {
-    clear
+function Custommenu {
+    Clear-Host
     Header
     Write-Host "---------------------------"
     Write-Host ""
@@ -87,7 +88,7 @@ function Custom {
     Write-Host ""
     Write-Host "---------------------------" 
     $Office = Read-Host "Please make a selection"    
-    clear
+    Clear-Host
     Header
     Write-Host "---------------------------"
     Write-Host ""
@@ -120,7 +121,7 @@ function Custom {
 }
 
 Function Customtext {
-    clear
+    Clear-Host
     Header
     Write-Host "This script will perform the following actions under the default profile:"
     Write-Host "* Disable built in Administrator account"
@@ -255,20 +256,30 @@ Function Customdeploy {
 }
 
 Do {
-    if ($Mainmenuselect -eq '0') {
-        InfoText
-    }
-    else { 
-        Custom
-        Clear-Host
-        Do {
+    MainMenu
+    $Mainmenuselect = Read-Host "Please make a selection"
+    Switch ($Mainmenuselect) {
+        '0' {
+            DefaultText
+            if ($Defaultselect -eq '1') {
+                Defaultdeploy
+            }
+            if ($Defaultselect -eq 'q') {
+                Exit
+        }
+        '1' {     
+            Custommenu
             Customtext
             if ($Customdeploy -eq '1') {
                 Customdeploy
             }
+            if ($Customdeploy -eq 'q') {
+                Exit
         }
-        until ($Customdeploy -eq 'q')
+        'q' {
+            Return
     }
+    Pause
 }
-until (($Mainmenuselect -eq 'q') -or ($Defaultselect -eq 'q'))
+Until (($Mainmenuselect -eq 'q') -or ($Defaultselect -eq 'q'))
 Exit
