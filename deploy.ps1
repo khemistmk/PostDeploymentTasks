@@ -270,7 +270,7 @@ Do {
                 }        
             }    
             Customtext
-            $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit
+            $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit"
             if ($Customdeploy -eq '1') {
                 Customdeploy
             }
