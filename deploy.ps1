@@ -231,8 +231,11 @@ Function Defaultdeploy {
 
 Function Customdeploy {
     Start-Process DefaultDeploy
-    Start-Process -FilePath $officedeploy
-    Start-Process -FilePath $PDF
+    Copy-Item -Path $officedeploy -Destination $scriptroot
+    Start-Process -FilePath "$scriptroot\$officedeploy" -ArgumentList "/Configure " -Wait
+    Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
+    Copy-Item -Path $PDFDeploy -Destination $scriptroot
+    Start-Process -FilePath "$scriptroot\$PDFdeploy"
 }
 
 Do {
@@ -253,20 +256,20 @@ Do {
             $Office = Read-Host "Please make a selection"
             switch ($Office) {
                 '1' {
-                    $officedeploy = "$deployroot\MS Office\Office 365\Setup32.exe"
+                    $officedeploy = "$deployroot\Microsoft Office\Office 365\Setup32.exe"
                  }
                 '2' {
-                    $officedeploy = "$deployroot\MS Office\Office 2021\Setup32.exe"
+                    $officedeploy = "$deployroot\Microsoft Office\Office 2021\Setup32.exe"
                 } 
             }
             CustomPDF
             $PDF = Read-Host "Please make a selection"
             switch ($PDF) {
                 '1' {
-                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe STD 2020\Setup.exe"
+                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe Acrobat 2020 Standard\Acrobat_2020_STD.zip"
                 }
                 '2' {
-                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe PRO 2020\Setup.exe"
+                    $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe Acrobat 2020 Pro\Acrobat_2020_Pro.zip"
                 }        
             }    
             Customtext
