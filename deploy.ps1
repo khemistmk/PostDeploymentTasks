@@ -356,4 +356,5 @@ Do {
     Pause
 }
 Until (($Mainmenuselect -eq 'q') -or ($Defaultselect -eq 'q'))
+Restart-Computer
 Exit
