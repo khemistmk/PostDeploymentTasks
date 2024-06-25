@@ -24,6 +24,7 @@ Requires -RunAsAdministrator
 #script root folders
 $deployroot = "\\tcs-deploy\techshare\"
 $scriptroot = "C:\Setup Files"
+$computername = hostname
 
 #System Update file location
 #grab latest from https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation
@@ -169,20 +170,30 @@ Function WinActivation {
     }
 }
 
-Function WinUpdate {
-    # Install the Windows Update module
-    Write-Host "[*] Getting ready to update Windows..." -ForegroundColor Yellow
-    Install-Module -Name PSWindowsUpdate -Force
-    # Import the Windows Update module
-    Import-Module PSWindowsUpdate
-    # Check for updates
-    Write-Host "[*] Running Windows Updates..." -ForegroundColor Yellow
-    Start-Process (Get-WindowsUpdate -AcceptAll -Install -AutoReboot)
-    Uninstall-Module -Name PSWindowsUpdate -Force
-    Write-Host "[*] Windows Updates completed." -ForegroundColor Green
-    # Restart the system if updates require a reboot
-    Write-Host "[*] Restarting Windows..." -ForegroundColor Red
+function WinUpdate {
+    Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
+    Start-Process -Filepath "UsoClient.exe" -ArgumentList "StartInteractiveScan" -Wait
+    Start-Process -Filepath "UsoClient.exe" -ArgumentList "ScanInstallWait" -Wait
+    Write-Host "[*] Installing Windows Updates..." -ForegroundColor Yellow
+    Start-Process -Filepath "UsoClient.exe" -ArgumentList "StartInstall" -Wait
+    Write-Host "[*] Reboot to complete Windows Updates..." -ForegroundColor Red   
 }
+
+#Function WinUpdate {
+    # Install the Windows Update module
+ #   Write-Host "[*] Getting ready to update Windows..." -ForegroundColor Yellow
+  #  Install-Module -Name PSWindowsUpdate -Force
+    # Import the Windows Update module
+  #  Import-Module PSWindowsUpdate
+    # Check for updates
+  #  Write-Host "[*] Running Windows Updates..." -ForegroundColor Yellow
+  #  Start-Process (Get-WindowsUpdate -AcceptAll -Install)
+  #  Uninstall-Module -Name PSWindowsUpdate -Force
+  #  Write-Host "[*] Windows Updates completed." -ForegroundColor Green
+    # Restart the system if updates require a reboot
+  #  Write-Host "[*] Restarting Windows..." -ForegroundColor Red
+#}
+
 function DotNet3 {
     #Enables .Net 3.5
     Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
@@ -209,7 +220,7 @@ function Bitlocker {
     }
     else {
         Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
-        Enable-Bitlocker -MountPoint C -UsedSpaceOnly -RecoveryPassword
+        Enable-BitLocker -MountPoint "C:" -EncryptionMethod Aes256 -RecoveryPasswordProtector
     }
     $Bitlockerkey = (Get-BitLockerVolume -MountPoint C).KeyProtector | Where-Object -Property KeyProtectorType -eq RecoveryPassword | Select-Object -Property KeyProtectorID,RecoveryPassword 
     $Bitlockerkey > "$scriptroot\$computername.txt"
