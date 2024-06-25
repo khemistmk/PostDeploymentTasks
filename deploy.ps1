@@ -2,6 +2,8 @@
 # Post-Deployment Script
 # by Timothy Wilson
 ###############################
+Requires -RunAsAdministrator
+[CmdletBinding()]
 # ---------------------------
 #
 #   This script will perform the following actions under the default profile:
@@ -102,20 +104,7 @@ Function CustomPDF {
 }
 
 Function Customtext {
-    Clear-Host
-    Header
-    Write-Host "This script will perform the following actions under the default profile:"
-    Write-Host "* Disable built in Administrator account"
-    Write-Host "* check and Set computer name to serial number"
-    Write-Host "* check activation and activate windows based on OEM bios key"
-    Write-Host "* install and run System Update if Lenovo, HP Image assistant if HP"
-    Write-Host "* run windows updates"
-    Write-Host "* run Ninite to install Chrome, Firefox, and VLC"
-    Write-Host "* activate bitlocker and print bitlocker key to file"
-    Write-Host "* install .Net 3.5"
-    Write-Host "* configure power plan: On Battery (screen off: 30min, sleep: never), Plugged in (screen off: 1 hr, sleep: never)"
-    Write-Host "* uninstall SmartDeploy"
-    Write-Host "* remove Deployment folders"
+    Defaulttext
     if ($Office -eq '1') {
         Write-Host "* Install Microsoft 365 Apps"
     }
@@ -147,28 +136,32 @@ Function ComputerName {
 }
 function DisableAdmin {
     Write-Host "[*] Checking default Administrator Account..." -ForegroundColor Yellow
-    $adminaccount = Get-LocalUser -Name Administrator
+    $adminaccount = Get-LocalUser -Name "Administrator"
     if ($adminaccount.Enabled -eq "False") {
-    Write-Host "[*] Disabling default Administrator Account..."-ForegroundColor Yellow
-    Start-Process -FilePath "$scriptroot\$disableadmin"
-    Write-Host "[*] Administrator account disabled." -ForegroundColor Green
+        Write-Host "[*] Administrator account disabled." -ForegroundColor Yellow
+    }
+    else {
+        Write-Host "[*] Disabling default Administrator Account..."-ForegroundColor Yellow
+        Disable-LocalUser -Name "Administrator"
+        Write-Host "[*] Administrator account disabled." -ForegroundColor Green
     }
 }
 Function WinActivation {
     Write-Host "[*] Checking Windows Activation..." -ForegroundColor Yellow
-    $OEMproductkey = wmic path softwarelicensingservice get OA3OriginalProductKey
-    $activationstatus = cscript c:\windows\system32\slmgr.vbs /xpr
-    if (($activationstatus -contains "permanently activated")){
-        Write-Host "Windows is Permanently Activated" -ForegroundColor Green
-        return
+    #Get OEM Product key from bios
+    $OEMproductkey = (Get-WmiObject -query ‘select * from SoftwareLicensingService’).OA3xOriginalProductKey
+    #Get Windows licensing status
+    $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
+    if ($licensestatus.LicenseStatus -eq 1){
+        Write-Host "[*] Windows is  Activated" -ForegroundColor Green
     }
     else {
         Write-Host "[*] Windows not yet activated." -ForegroundColor Yellow
-        slmgr /ipk $OEMproductkey
-        Write-Host "[*] Activating Windows..." -ForegroundColor Green
-        if (($activationstatus -contains "permanently activated")){
+        Write-Host "[*] Activating Windows..." -ForegroundColor Yellow
+        $licensestatus.InstallProductKey($OEMproductkey)
+        $licensestatus.RefeshLicenseStatus()
+        if ($licensestatus.LicenseStatus -eq 1){
             Write-Host "Windows is Permanently Activated" -ForegroundColor Green
-            return
         }
         else {
             Write-Error -Message "[*] Windows failed to activate..." 
@@ -176,7 +169,7 @@ Function WinActivation {
     }
 }
 
-Function windowsupdate {
+Function WinUpdate {
     # Install the Windows Update module
     Write-Host "[*] Getting ready to update Windows..." -ForegroundColor Yellow
     Install-Module -Name PSWindowsUpdate -Force
@@ -288,7 +281,7 @@ Function Defaultdeploy {
     RMDeployfiles
     SmartDeploy
     SystemUpdate
-    windowsupdate
+    WinUpdate
     Bitlocker
 }
 
