@@ -189,7 +189,6 @@ Function windowsupdate {
     Write-Host "[*] Windows Updates completed." -ForegroundColor Green
     # Restart the system if updates require a reboot
     Write-Host "[*] Restarting Windows..." -ForegroundColor Red
-    Restart-Computer -Force
 }
 function DotNet3 {
     #Enables .Net 3.5
