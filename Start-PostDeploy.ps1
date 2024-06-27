@@ -40,7 +40,7 @@ $ninite = "AppInstaller32.exe"
 ############################################
 Clear-Host
 #Structure
-Function Header {
+Function Set-Header {
     Clear-Host
     Write-Host "---------------------------"
     Write-Host ""
@@ -50,9 +50,9 @@ Function Header {
 }
 
 #Menu
-Function MainMenu {
+Function Set-MainMenu {
     Clear-Host
-    Header 
+    Set-Header 
     Write-Host "---------------------------"
     Write-Host ""
     Write-Host " (0) Default Deployment (No Office, No PDF)"
@@ -62,9 +62,9 @@ Function MainMenu {
     Write-Host "---------------------------" 
 }
 
-Function Defaulttext {
+Function Set-Defaulttext {
     Clear-Host
-    Header
+    Set-Header
     Write-Host "This script will perform the following actions under the default profile:"
     Write-Host "* Disable built in Administrator account"
     Write-Host "* check and Set computer name to serial number"
@@ -79,9 +79,9 @@ Function Defaulttext {
     Write-Host "* remove Deployment folders"
 }
 
-function Customoffice {
+function Set-Office {
     Clear-Host
-    Header
+    Set-Header
     Write-Host "---------------------------"
     Write-Host ""
     Write-Host " Select Office Version"
@@ -91,9 +91,9 @@ function Customoffice {
     Write-Host "---------------------------"
 }
 
-Function CustomPDF {    
+Function Set-PDF {    
     Clear-Host
-    Header
+    Set-Header
     Write-Host "---------------------------"
     Write-Host ""
     Write-Host " Select PDF Version"
@@ -104,8 +104,8 @@ Function CustomPDF {
     Write-Host "---------------------------" 
 }
 
-Function Customtext {
-    Defaulttext
+Function Set-Customtext {
+    Set-Defaulttext
     if ($Office -eq '1') {
         Write-Host "* Install Microsoft 365 Apps"
     }
@@ -123,7 +123,7 @@ Function Customtext {
 }
 
 #Installation and changes
-Function ComputerName {
+Function Set-ComputerName {
     Write-Host "[*] Setting Computer name..." -ForegroundColor Yellow
     $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
     $computername = hostname
@@ -135,7 +135,7 @@ Function ComputerName {
     }
     Write-Host "[*] Computer name set to $computername" -ForegroundColor Green
 }
-function DisableAdmin {
+function Set-AdminDisable {
     Write-Host "[*] Checking default Administrator Account..." -ForegroundColor Yellow
     $adminaccount = Get-LocalUser -Name "Administrator"
     if ($adminaccount.Enabled -eq "False") {
@@ -147,7 +147,7 @@ function DisableAdmin {
         Write-Host "[*] Administrator account disabled." -ForegroundColor Green
     }
 }
-Function WinActivation {
+Function Install-OEMKey {
     Write-Host "[*] Checking Windows Activation..." -ForegroundColor Yellow
     #Get OEM Product key from bios
     $OEMproductkey = (Get-WmiObject -query ‘select * from SoftwareLicensingService’).OA3xOriginalProductKey
@@ -170,7 +170,7 @@ Function WinActivation {
     }
 }
 
-function WinUpdate {
+function Install-WindowsUpdates {
     Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
     Start-Process -Filepath "UsoClient.exe" -ArgumentList "StartInteractiveScan" -Wait
     Start-Process -Filepath "UsoClient.exe" -ArgumentList "ScanInstallWait" -Wait
@@ -179,22 +179,7 @@ function WinUpdate {
     Write-Host "[*] Reboot to complete Windows Updates..." -ForegroundColor Red   
 }
 
-#Function WinUpdate {
-    # Install the Windows Update module
- #   Write-Host "[*] Getting ready to update Windows..." -ForegroundColor Yellow
-  #  Install-Module -Name PSWindowsUpdate -Force
-    # Import the Windows Update module
-  #  Import-Module PSWindowsUpdate
-    # Check for updates
-  #  Write-Host "[*] Running Windows Updates..." -ForegroundColor Yellow
-  #  Start-Process (Get-WindowsUpdate -AcceptAll -Install)
-  #  Uninstall-Module -Name PSWindowsUpdate -Force
-  #  Write-Host "[*] Windows Updates completed." -ForegroundColor Green
-    # Restart the system if updates require a reboot
-  #  Write-Host "[*] Restarting Windows..." -ForegroundColor Red
-#}
-
-function DotNet3 {
+function Enable-DotNet {
     #Enables .Net 3.5
     Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
     $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
@@ -202,17 +187,22 @@ function DotNet3 {
         Write-Host "[*] .Net 3.5 Enabled" -ForegroundColor Green
     }
     else {
-        Write-Host "[*] Enabling .Net 3.5" -ForegroundColor Yellow
+        Write-Host "[*] Enabling .Net 3.5..." -ForegroundColor Yellow
         DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
         Write-Host "[*] .Net 3.5 Enabled" -ForegroundColor Green
     }
     Write-Host "[*] Checking .Net 4.8 Status..." -ForegroundColor Yellow
-    $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 4 -and $_.Minor -eq 8}).Count -ge 1
-    if ($dotnet3 -eq 'True') {
+    $dotnet4 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 4 -and $_.Minor -eq 8}).Count -ge 1
+    if ($dotnet4 -eq 'True') {
         Write-Host "[*] .Net 4.8 Enabled" -ForegroundColor Green
     }
+    else {
+        Write-Host "[*] Installing .Net 4.8..."
+        Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" -OutFile "C:\Setup Files\net48Installer.exe"
+        Start-Process -FilePath "$scriptroot\net48installer.exe" -ArgumentList "/install /quiet /norestart"
+    }
 }
-function Bitlocker {
+function Set-BitlockerDrive {
     #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
     Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
     if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq 'FullyEncrypted') {
@@ -227,7 +217,7 @@ function Bitlocker {
     Write-Host "Bitlocker enabled. Bitlocker key is saved to $scriptroot\$computername.txt" -ForegroundColor Green
     Write-Host "$Bitlockerkey" -ForegroundColor Yellow
 }
-Function SystemUpdate {
+Function Install-SystemUpdate {
     Write-Host "[*] Checking manufacturer..." -ForegroundColor Yellow
     $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer 
     if ($Manufacturer -contains "Lenovo"){
@@ -252,10 +242,10 @@ Function SystemUpdate {
     Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
     }
 }
-Function Ninite {
-    Start-Process -Filepath "$scriptroot\$Ninite"
+Function Start-Ninite {
+    Start-Process -Filepath "$scriptroot\$Ninite" -ArgumentList "/Silent"
 }
-Function RMDeployfiles {
+Function Remove-Deploymentfiles {
     Write-Host "[*] Removing OEM and Platform folders..." -ForegroundColor Yellow
     $oem = "C:\OEM"
     $platform = "C:\Platform"
@@ -274,7 +264,7 @@ Function RMDeployfiles {
         Write-Host "[*] Platform folder removed." -ForegroundColor Green
     }
 }
-Function SmartDeploy {
+Function Uninstall-SmartDeploy {
     Write-Host "[*] Uninstalling Smart Deploy..." -ForegroundColor Yellow
     $Installer = New-Object -ComObject WindowsInstaller.Installer 
     $InstallerProducts = $Installer.ProductsEx("", "", 7)
@@ -284,25 +274,38 @@ Function SmartDeploy {
     Write-Host "[*] Smart Deploy Uninstalled" -ForegroundColor Green
 }
 
-Function Defaultdeploy {
-    WinActivation
-    ComputerName
-    DotNet3
-    Ninite
-    RMDeployfiles
-    SmartDeploy
-    SystemUpdate
-    WinUpdate
-    Bitlocker
+Function Start-Defaultdeploy {
+    Set-ComputerName
+    Set-AdminDisable
+    Install-OEMKey
+    Install-SystemUpdate
+    Install-WindowsUpdates
+    Enable-DotNet
+    Remove-Deploymentfiles
+    Start-Ninite
+    Uninstall-SmartDeploy
+    Install-SystemUpdate
+    Install-WindowsUpdates
+    Set-BitlockerDrive
 }
 
 Function Customdeploy {
-    Start-Process DefaultDeploy
+    Start-DefaultDeploy
+    $deployconnect = Test-Path -Path $deployroot
+    if ($deployconnect -eq "True") {
     Copy-Item -Path $officedeploy -Destination $scriptroot
     Start-Process -FilePath "$scriptroot\$officedeploy" -ArgumentList "/Configure " -Wait
-    Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
+    Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"  
     Copy-Item -Path $PDFDeploy -Destination $scriptroot
     Start-Process -FilePath "$scriptroot\$PDFdeploy"
+    }
+    else {
+        Invoke-WebRequest "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_17531-20046.exe" -OutFile "$scriptroot\ODT.exe"
+        Start-Process -FilePath "$scriptroot\ODT.exe" -ArgumentList "/passive /extract:C:\temp\office\" -Wait
+        Move-Item -Path "C:\temp\office"-Destination "$scriptroot\Office"
+        Remove-Item -Path "C:\temp\office"
+        
+    }
 }
 
 Do {
