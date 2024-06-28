@@ -24,6 +24,7 @@ Requires -RunAsAdministrator
 #script root folders
 $deployroot = "\\tcs-deploy\techshare\"
 $scriptroot = "C:\Setup Files"
+$officefolder = "\Office\"
 $computername = hostname
 
 #System Update file location
@@ -289,61 +290,103 @@ Function Start-Defaultdeploy {
     Set-BitlockerDrive
 }
 
-Function Customdeploy {
+Function Start-Customdeploy {
     Start-DefaultDeploy
     $deployconnect = Test-Path -Path $deployroot
     if ($deployconnect -eq "True") {
-    Copy-Item -Path $officedeploy -Destination $scriptroot
-    Start-Process -FilePath "$scriptroot\$officedeploy" -ArgumentList "/Configure " -Wait
-    Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"  
-    Copy-Item -Path $PDFDeploy -Destination $scriptroot
-    Start-Process -FilePath "$scriptroot\$PDFdeploy"
+        Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
+        Copy-Item -Path "$deployroot\Microsoft Office\$officefolder" -Destination "$scriptroot\$officefolder"
+        Set-Location -Path "$scriptroot\$officefolder"
+        Write-Host "[*] Installing Office..." -ForegroundColor Yellow
+        Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
+        Set-Location -Path $scriptroot
+        $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
+        if ($officeinstalled -eq "True") {
+            Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
+            Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
+            Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
+        }
+        else {
+            Write-Error "[*] Microsoft Office Failed to install."
+        }
+        Write-Host "[*] Copying Adobe files..." -ForegroundColor Yellow  
+        Copy-Item -Path $PDFDeploy -Destination $scriptroot
+        Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
+        Expand-Archive -Path "$scriptroot\$PDFzip"
+        Write-Host "[*] Installing $PDFFolder"
+        Start-Process -FilePath "$scriptroot\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
     }
+    elseif (Test-Path -Path "$scriptroot\Office*\Setup*"){
+        Set-Location -Path "$scriptroot\$officefolder"
+        Write-Host "[*] Installing Office..." -ForegroundColor Yellow
+        Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
+        Set-Location -Path $scriptroot
+        $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
+        if ($officeinstalled -eq "True") {
+            Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
+            Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
+            Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
+        }
+        else {
+            Write-Error "[*] Microsoft Office Failed to install."
+        }
+        Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
+        Expand-Archive -Path "$scriptroot\$PDFzip"
+        Write-Host "[*] Installing $PDFFolder"
+        Start-Process -FilePath "$scriptroot\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
+    }
+    
     else {
         Invoke-WebRequest "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_17531-20046.exe" -OutFile "$scriptroot\ODT.exe"
         Start-Process -FilePath "$scriptroot\ODT.exe" -ArgumentList "/passive /extract:C:\temp\office\" -Wait
         Move-Item -Path "C:\temp\office"-Destination "$scriptroot\Office"
         Remove-Item -Path "C:\temp\office"
-        
+
     }
 }
 
 Do {
-    MainMenu
+    Set-MainMenu
     $Mainmenuselect = Read-Host "Please make a selection"
     Switch ($Mainmenuselect) {
         '0' {
-            DefaultText
+            Set-DefaultText
             $Defaultselect = Read-Host " Press (1) to Deploy. Press (q) to quit"
             if ($Defaultselect -eq '1') {
-                Defaultdeploy
+                Start-Defaultdeploy
             }
             if ($Defaultselect -eq 'q') {
                 Exit
             }
         }
         '1' {     
-            CustomOffice
+            Set-Office
             $Office = Read-Host "Please make a selection"
             switch ($Office) {
                 '1' {
-                    $officedeploy = "$deployroot\Microsoft Office\Office 365\Setup32.exe"
+                    $officefolder = "Office 365"
+                    $config = "configuration-Office365Business.xml"
                  }
                 '2' {
-                    $officedeploy = "$deployroot\Microsoft Office\Office 2021\Setup32.exe"
+                    $officefolder = "Office HBE 2021"
+                    $config = "configuration-OfficeHBE2021.xml"
                 } 
             }
-            CustomPDF
+            Set-PDF
             $PDF = Read-Host "Please make a selection"
             switch ($PDF) {
                 '1' {
                     $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe Acrobat 2020 Standard\Acrobat_2020_STD.zip"
+                    $PDFZip = "Acrobat_2020_STD.zip"
+                    $PDFFolder = "Acrobat_2020_STD"
                 }
                 '2' {
                     $PDFDeploy = "$deployroot\Third Party\Adobe\Adobe Acrobat 2020 Pro\Acrobat_2020_Pro.zip"
+                    $PDFZip = "Acrobat_2020_PRO.zip"
+                    $PDFfolder = "Acrobat_2020_PRO"
                 }        
             }    
-            Customtext
+            Set-Customtext
             $Customdeploy = Read-Host " Press (1) to Deploy. Press (q) to quit"
             if ($Customdeploy -eq '1') {
                 Customdeploy
