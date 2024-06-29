@@ -1,5 +1,5 @@
 Function Install-MSOffice {
-    Start-DefaultDeploy
+    $deployroot = "\\tcs-deploy\techshare"
     $deployconnect = Test-Path -Path $deployroot
     if ($deployconnect -eq "True") {
         Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
