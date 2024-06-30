@@ -7,7 +7,15 @@ function Enable-DotNet {
 
 #>
     [CmdletBinding()]
-    param ()
+    param (
+        [Parameter()]
+        [ValidateSet("Enabled", "Disabled")]
+        [string]$setdotnet3,
+        
+        [Parameter()]
+        [ValidateSet("Enabled", "Disabled")]
+        [string]$setdotnet4
+    )
     #Enables .Net 3.5
     Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
     $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
