@@ -8,7 +8,17 @@ function Set-PowerOptions {
 #>
     [CmdletBinding()]
     param {
+        [Parameter()]
+        [int]$montimeoutac,
+        
+        [Parameter()]
+        [int]$montimeoutdc,
 
+        [Parameter()]
+        [int]$sbtimeoutac,
+
+        [Parameter()]
+        [int]$sbtimeoutdc
     }
 
     begin {
@@ -16,7 +26,10 @@ function Set-PowerOptions {
     }
 
     process {
-
+        Powercfg /Change monitor-timeout-ac $montimeoutac
+        Powercfg /Change monitor-timeout-dc $montimeoutdc
+        Powercfg /Change standby-timeout-ac $sbtimeoutac
+        Powercfg /Change standby-timeout-dc $sbtimeoutdc
     }
 
     end {
