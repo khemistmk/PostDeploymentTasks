@@ -6,7 +6,7 @@ function Invoke-PostDeploymentTasks {
         This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
 
 #>
-
+    [CmdletBinding()]
     param {
 
     }
