@@ -1,4 +1,13 @@
 function Enable-DotNet {
+<#
+    .SYNOPSIS 
+        This script automates the Post Deployment process.
+    .DESCRIPTION
+        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
+
+#>
+    [CmdletBinding()]
+    param ()
     #Enables .Net 3.5
     Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
     $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
