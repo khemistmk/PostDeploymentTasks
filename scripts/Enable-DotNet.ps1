@@ -35,7 +35,16 @@ function Enable-DotNet {
                 }
             }
             'Disabled' {
-
+                Write-Host "[*] Checking .Net 3.5 Status..." -ForegroundColor Yellow
+                $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
+                if ($dotnet3 -eq 'False') {
+                    Write-Host "[*] .Net 3.5 Disabled" -ForegroundColor Green
+                }
+                else {
+                    Write-Host "[*] Disabling .Net 3.5..." -ForegroundColor Yellow
+                    Disable-WindowsOptionalFeature -Online -FeatureName "NetFx3" -Source "SourcePath"
+                    Write-Host "[*] .Net 3.5 Disabled" -ForegroundColor Green
+                }
             }
         }
         switch ($setdotnet4) {
@@ -46,9 +55,9 @@ function Enable-DotNet {
                     Write-Host "[*] .Net 4.8 Enabled" -ForegroundColor Green
                 }
                 else {
-                    Write-Host "[*] Installing .Net 4.8..."
-                    Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" -OutFile "$PSScriptroot\net48Installer.exe"
-                    Start-Process -FilePath "$PSscriptroot\net48installer.exe" -ArgumentList "/install /quiet /norestart"
+                    Write-Host "[*] Enabling .Net 4.8..." -ForegroundColor Yellow
+                    Enable-WindowsOptionalFeature -Online -FeatureName "NetFx4" -Source "SourcePath"
+                    Write-Host "[*] .Net 4.8 Enabled" -ForegroundColor Green
                 }
             }
         }
