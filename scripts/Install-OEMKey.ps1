@@ -1,4 +1,18 @@
 Function Install-OEMKey {
+    <#
+    .SYNOPSIS 
+        This script automates the Post Deployment process.
+    .DESCRIPTION
+        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
+
+#>
+    [CmdletBinding()]
+    param ()
+
+    begin {
+    }
+
+    process {
     Write-Host "[*] Checking Windows Activation..." -ForegroundColor Yellow
     #Get OEM Product key from bios
     $OEMproductkey = (Get-WmiObject -query ‘select * from SoftwareLicensingService’).OA3xOriginalProductKey
@@ -18,5 +32,6 @@ Function Install-OEMKey {
         else {
             Write-Error -Message "[*] Windows failed to activate..." 
         }
+    }
     }
 }
