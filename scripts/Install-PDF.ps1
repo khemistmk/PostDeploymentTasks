@@ -9,7 +9,7 @@ Function Install-PDF {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$scriptroot = $PSScriptroot,
+        [string]$officefolder 
 
         [Parameter()]
         [string]$deployroot
@@ -19,8 +19,12 @@ Function Install-PDF {
     }
 
     process {
-    $deployconnect = Test-Path -Path $deployroot
-    if ($deployconnect -eq "True") {
+        if ($deployroot -neq $PSScriptRoot) {
+            $deployconnect = Test-Path -Path $deployroot
+        }
+
+        $deployconnect = Test-Path -Path $deployroot
+        if ($deployconnect -eq "True") {
         Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
         Copy-Item -Path "$deployroot\Microsoft Office\$officefolder" -Destination "$scriptroot\$officefolder"
         Set-Location -Path "$scriptroot\$officefolder"

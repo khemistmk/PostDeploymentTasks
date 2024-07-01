@@ -1,10 +1,13 @@
 function Enable-DotNet {
 <#
     .SYNOPSIS 
-        This script automates the Post Deployment process.
+        This script will enable or disable .Net Framework.
     .DESCRIPTION
-        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
-
+        This script aims to streamline and automate the enabling and disabling of.Net framework version 3.5 and 4.8.
+    .PARAMETER setdotnet3
+        Sets .Net Framework version 3.5 to enabled or disabled.
+    .PARAMETER setdotnet4
+        Sets .Net Framework version 4.8 to enabled or disabled.
 #>
     [CmdletBinding()]
     param (
