@@ -1,9 +1,9 @@
 function Set-PowerOptions {
 <#
     .SYNOPSIS 
-        This script automates the Post Deployment process.
+        This script automates setting various power options.
     .DESCRIPTION
-        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
+        This script aims to streamline and automate setting various power options required for standard deployments.
 
 #>
     [CmdletBinding()]
