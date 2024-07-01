@@ -9,32 +9,32 @@ function Set-PowerOptions {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [int]$montimeoutac,
+        [int]$montimeoutac = 60,
         
         [Parameter()]
-        [int]$montimeoutdc,
+        [int]$montimeoutdc = 30,
 
         [Parameter()]
-        [int]$sbtimeoutac,
+        [int]$sbtimeoutac = 0,
 
         [Parameter()]
-        [int]$sbtimeoutdc,
+        [int]$sbtimeoutdc = 0,
 
         [Parameter()]
         [ValidateSet("Enabled", "Disabled")]
-        [string]$faststartup,
+        [string]$faststartup = "Disabled",
 
         [Parameter()]
         [ValidateSet("Nothing", "Sleep", "Hibernate", "ShutDown")]
-        [string]$powerbutton,
+        [string]$powerbutton = "Shutdown",
         
         [Parameter()]
         [ValidateSet("Nothing", "Sleep", "Hibernate", "ShutDown")]
-        [string]$sleepbutton,
+        [string]$sleepbutton = "Shutdown",
 
         [Parameter()]
         [ValidateSet("Nothing", "Sleep", "Hibernate", "ShutDown")]
-        [string]$closelid
+        [string]$closelid = "Nothing"
     )
 
     begin {
@@ -50,19 +50,36 @@ function Set-PowerOptions {
         if (-not (Test-IsAdmin)) {
             Write-Error -Message "Access Denied. Please run with Administrator privileges."
         }
+        Write-Host "[*] Setting Power Options..." -ForegroundColor Yellow
         Powercfg /Change monitor-timeout-ac $montimeoutac
+        Write-Host "[*] Set Display Turn off in $montimeoutac minutes when plugged in." -ForegroundColor Green
         Powercfg /Change monitor-timeout-dc $montimeoutdc
+        Write-Host "[*] Set Display Turn off in $montimeoutdc minutes when on battery." -ForegroundColor Green
         Powercfg /Change standby-timeout-ac $sbtimeoutac
+        if ($sbtimeoutac -eq 0) {
+            $sleepac = "Never"
+        }
+        else {
+            $sleepac = "$sbtimeoutac minutes" 
+        }
+        Write-Host "[*] Set Sleep Turn off in $sleepac when plugged in." -ForegroundColor Green
         Powercfg /Change standby-timeout-dc $sbtimeoutdc
+        if ($sbtimeoutac -eq 0) {
+            $sleepdc = "Never"
+        }
+        else {
+            $sleepdc = "$sbtimeoutac minutes" 
+        }
+        Write-Host "[*] Set Sleep Turn off in $sleepdc when on battery." -ForegroundColor Green
         
         $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
         $fsName = "HiberbootEnabled"
         
         switch ($faststartup) {
-            'Enable' {
+            'Enabled' {
                 $fsValue = "1"
             }
-            'Disable' {
+            'Disabled' {
                 $fsValue = '0'
             }
         }
@@ -71,9 +88,11 @@ function Set-PowerOptions {
             if (-not $(Test-Path $fsPath)) {
                 New-Item -Path $fsPath -Force | Out-Null
                 New-ItemProperty -Path $fsPath -Name $fsName -Value $fsValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Fast Startup set to $faststartup." -ForegroundColor Green
             }
             else {
                 New-ItemProperty -Path $fsPath -Name $fsName -Value $fsValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Fast Startup set to $faststartup." -ForegroundColor Green
             }
         }
         catch {
@@ -105,10 +124,12 @@ function Set-PowerOptions {
                 New-Item -Path $pbPath -Force | Out-Null
                 New-ItemProperty -Path $pbPath -Name $pbNameAC -Value $pbValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $pbPath -Name $pbNameDC -Value $pbValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Power button set to $powerbutton." -ForegroundColor Green
             }
             else {
                 New-ItemProperty -Path $pbPath -Name $pbNameAC -Value $pbValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $pbPath -Name $pbNameDC -Value $pbValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Power button set to $powerbutton." -ForegroundColor Green
             }
         }
         catch {
@@ -139,10 +160,12 @@ function Set-PowerOptions {
                 New-Item -Path $sbPath -Force | Out-Null
                 New-ItemProperty -Path $sbPath -Name $sbNameAC -Value $sbValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $sbPath -Name $sbNameDC -Value $sbValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Sleep button set to $sleepbutton." -ForegroundColor Green
             }
             else {
                 New-ItemProperty -Path $sbPath -Name $sbNameAC -Value $sbValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $sbPath -Name $sbNameDC -Value $sbValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Sleep button set to $sleepbutton." -ForegroundColor Green
             }
         }
         catch {
@@ -173,21 +196,18 @@ function Set-PowerOptions {
                 New-Item -Path $clPath -Force | Out-Null
                 New-ItemProperty -Path $clPath -Name $clNameAC -Value $clValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $clPath -Name $clNameDC -Value $clValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Close lid set to $closelid." -ForegroundColor Green
             }
             else {
                 New-ItemProperty -Path $clPath -Name $clNameAC -Value $clValue -PropertyType DWord -Force | Out-Null
                 New-ItemProperty -Path $clPath -Name $clNameDC -Value $clValue -PropertyType DWord -Force | Out-Null
+                Write-Host "[*] Close lid set to $closelid." -ForegroundColor Green
             }
         }
         catch {
             Write-Error $_
             Write-Host "Failed to set Close Lid setting"
         }
-        exit 1
-    }
-
-    end {
-
     }
 
 }
