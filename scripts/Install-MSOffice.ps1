@@ -1,4 +1,18 @@
 Function Install-MSOffice {
+<#
+    .SYNOPSIS 
+        This script automates the Post Deployment process.
+    .DESCRIPTION
+        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
+
+#>
+    [CmdletBinding()]
+    param ()
+
+    begin {
+    }
+
+    process {
     $deployroot = "\\tcs-deploy\techshare"
     $deployconnect = Test-Path -Path $deployroot
     if ($deployconnect -eq "True") {
@@ -50,5 +64,6 @@ Function Install-MSOffice {
         Move-Item -Path "C:\temp\office"-Destination "$scriptroot\Office"
         Remove-Item -Path "C:\temp\office"
 
+    }
     }
 }
