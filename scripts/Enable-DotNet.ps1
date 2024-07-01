@@ -30,7 +30,7 @@ function Enable-DotNet {
                 }
                 else {
                     Write-Host "[*] Enabling .Net 3.5..." -ForegroundColor Yellow
-                    DISM /Online /Enable-Feature /FeatureName:NetFx3 /All
+                    Enable-WindowsOptionalFeature -Online -FeatureName "NetFx3" -Source "SourcePath"
                     Write-Host "[*] .Net 3.5 Enabled" -ForegroundColor Green
                 }
             }
@@ -47,8 +47,8 @@ function Enable-DotNet {
                 }
                 else {
                     Write-Host "[*] Installing .Net 4.8..."
-                    Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" -OutFile "C:\Setup Files\net48Installer.exe"
-                    Start-Process -FilePath "$scriptroot\net48installer.exe" -ArgumentList "/install /quiet /norestart"
+                    Invoke-WebRequest "https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe" -OutFile "$PSScriptroot\net48Installer.exe"
+                    Start-Process -FilePath "$PSscriptroot\net48installer.exe" -ArgumentList "/install /quiet /norestart"
                 }
             }
         }
