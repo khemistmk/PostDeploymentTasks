@@ -28,7 +28,7 @@ function Invoke-PostDeploymentTasks {
                 <Association Identifier="https" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
                 <Association Identifier="mailto" ProgId="Outlook.URL.mailto.15" ApplicationName="Outlook" />
                 </DefaultAssociations>
-                "@
+"@
             
         }
     
