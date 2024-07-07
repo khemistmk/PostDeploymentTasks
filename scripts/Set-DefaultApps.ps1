@@ -17,21 +17,9 @@ function Invoke-PostDeploymentTasks {
         process {
             
 
-            $myProject = 'Myproject'
-$path = "c:\temp\Myproject.xml"
-
-$xmlsettings = New-Object System.Xml.XmlWriterSettings
-$xmlsettings.Indent = $true
-
-$xmlWriter = [System.XML.XmlWriter]::Create($path, $xmlsettings)
-$xmlWriter.WriteStartElement("Item") 
-$xmlWriter.WriteAttributeString("Version", "1.0")
-$xmlWriter.WriteElementString("Name",$myProject)
-$xmlWriter.WriteElementString("GUID",(New-Guid).Guid.ToUpper())
-$xmlWriter.WriteEndElement()
-
-$xmlWriter.Flush()
-$xmlWriter.Close()    <?xml version="1.0" encoding="UTF-8"?>
+            
+            $xml = @"
+                <?xml version="1.0" encoding="UTF-8"?>
                 <DefaultAssociations>
                 <Association Identifier=".htm" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
                 <Association Identifier=".html" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
