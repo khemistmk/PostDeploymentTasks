@@ -27,7 +27,19 @@ function Invoke-PostDeploymentTasks {
     }
 
     process {
-        Start-Process 
+
+        function Defaultdeploy {
+            Install-OEMKey
+            Set-ComputerName
+            Set-AdminDisable
+            Set-PowerOptions
+            Remove-DeploymentFiles
+            Uninstall-SmartDeploy
+            Start-Ninite
+            Install-SystemUpdate
+            Install-WindowsUpdates
+        }
+       
     }
 
     end {
