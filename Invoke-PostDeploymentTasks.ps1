@@ -14,12 +14,7 @@ function Invoke-PostDeploymentTasks {
         
         [Parameter()]
         [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
-        $InstallPDFVers,
-        [Parameter()]
-        $NoOffice,
-
-        [Parameter()]
-        $NoPDF
+        $InstallPDFVers
     )
 
     begin {
@@ -27,7 +22,6 @@ function Invoke-PostDeploymentTasks {
     }
 
     process {
-
         function Defaultdeploy {
             Install-OEMKey
             Set-ComputerName
@@ -38,8 +32,12 @@ function Invoke-PostDeploymentTasks {
             Start-Ninite
             Install-SystemUpdate
             Install-WindowsUpdates
+            Get-BitLockerVolume
         }
-       
+        if (-Not $InstallOfficevers.IsPresent -and -not $InstallPDFvers.Ispresent) {
+            Defaultdeploy
+        }
+        
     }
 
     end {
