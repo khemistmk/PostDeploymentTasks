@@ -27,7 +27,7 @@ function Invoke-PostDeploymentTasks {
     }
 
     process {
-
+        Start-Process 
     }
 
     end {
