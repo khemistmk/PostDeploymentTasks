@@ -22,7 +22,7 @@ Function Install-PDF {
         if ($deployroot -neq $PSScriptRoot) {
             $deployconnect = Test-Path -Path $deployroot
         }
-
+        $scriptroot = $PSScriptroot
         $deployconnect = Test-Path -Path $deployroot
         if ($deployconnect -eq "True") {
         Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
