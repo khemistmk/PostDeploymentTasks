@@ -13,7 +13,30 @@ function Set-BitlockerDrive {
         Select-Object -Property KeyProtectorID,RecoveryPassword 
     $blid = $bitlockerkey.KeyProtectorID
     $blpw = $bitlockerkey.RecoveryPassword
-    "Identifier","$blid" > "$PSScriptroot\$computername.txt"
+    $bitlockerfile = @"
+          BitLocker Drive Encryption recovery key
+
+To verify that this is the correct recovery key, compare the start of the following identifier with
+the identifier value displayed on your PC.
+
+Identifier:
+
+	$blid
+
+If the above identifier matches the one displayed by your PC, then use the following key to
+unlock your drive.
+
+Recovery Key:
+
+	$blpw
+
+If the above identifier doesn't match the one displayed by your PC, then this isn't the right key
+to unlock your drive.
+Try another recovery key, or refer to https://go.microsoft.com/fwlink/?LinkID=260589 for
+additional assistance.
+"@
+    
+    $bitlockerfile> "$PSScriptroot\$computername.txt"
     Write-Host "Bitlocker enabled. Bitlocker key is saved to $scriptroot\$computername.txt" -ForegroundColor Green
     Write-Host "$Bitlockerkey" -ForegroundColor Yellow
 }
