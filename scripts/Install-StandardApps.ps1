@@ -19,19 +19,19 @@ Function Install-StandardApps {
     }
 
     process {
-        Write-Host "[*] Installing Google Chrome..." - Foregroundcolor Yellow
+        Write-Host "[*] Installing Google Chrome..." -Foregroundcolor Yellow
         winget install -e --id Google.Chrome --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Google Chrome installed." - Foregroundcolor Green
-        Write-Host "[*] Installing Firefox..." - Foregroundcolor Yellow
+        Write-Host "[*] Google Chrome installed." -Foregroundcolor Green
+        Write-Host "[*] Installing Firefox..." -Foregroundcolor Yellow
         winget install -e --id Mozilla.Firefox --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Firefox installed." - Foregroundcolor Green
-        Write-Host "[*] Installing VLC..." - Foregroundcolor Yellow
+        Write-Host "[*] Firefox installed." -Foregroundcolor Green
+        Write-Host "[*] Installing VLC..." -Foregroundcolor Yellow
         winget install -e --id VideoLAN.VLC --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] VLC installed." - Foregroundcolor Green
-        Write-Host "[*] Installing Adobe Reader..." - Foregroundcolor Yellow
+        Write-Host "[*] VLC installed." -Foregroundcolor Green
+        Write-Host "[*] Installing Adobe Reader..." -Foregroundcolor Yellow
         winget install -e --id Adobe.Acrobat.Reader.64-bit --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Adobe Reader installed." - Foregroundcolor Green
-        Write-Host "[*] Installing 7zip..." - Foregroundcolor Yellow
+        Write-Host "[*] Adobe Reader installed." -Foregroundcolor Green
+        Write-Host "[*] Installing 7zip..." -Foregroundcolor Yellow
         $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
             Select-Object -ExpandProperty Links | 
             Where-Object {($_.innerHTML -eq 'Download') -and ($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
