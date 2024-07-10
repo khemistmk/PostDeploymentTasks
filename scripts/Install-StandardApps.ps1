@@ -38,6 +38,7 @@ Function Install-StandardApps {
             Select-Object -ExpandProperty href)
         Invoke-WebRequest $webLocation -OutFile $TemporaryDownloadFile
         Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
+        Write-Host "[*] 7zip Installed." -Foregroundcolor Green
     
     }
     end {
