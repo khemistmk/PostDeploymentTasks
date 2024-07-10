@@ -4,12 +4,12 @@ function Set-BitlockerDrive {
         This script will check if Bitlocker is enabled and, if not, enable it.
     .DESCRIPTION
         This script will check if Bitlocker is enabled and, if not, enable it and output the recover information into a text file
-    .PARAMETER OEM
-        This is the OEM folder left over during the deployment process.
-            -Default value is $OEM = "C:\OEM"
-    .PARAMETER OEM
-        This is the Platform folder left over during the deployment process.
-            -Default value is $platform = "C:\Platform"
+    .PARAMETER mountpoint
+        This is the mountpoint to be encrypted.
+    .PARAMETER savelocation
+        This is the folder to save the bitlocker key.
+    .PARAMETER Filename
+        This is the filename to give the bitlocker key file. 
 #>
     [CmdletBinding()]
     param (
