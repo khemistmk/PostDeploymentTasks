@@ -8,7 +8,7 @@ Function Install-StandardApps {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\7Zip\"
+        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\"
         
     )
 
@@ -34,8 +34,8 @@ Function Install-StandardApps {
         Write-Host "[*] Installing 7zip..." -Foregroundcolor Yellow
         $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
             Select-Object -ExpandProperty Links | 
-            Where-Object {($_.innerHTML -eq 'Download') -and ($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
-            Select-Object -ExpandProperty href).Split(' ')[0]
+            Where-Object {($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
+            Select-Object -ExpandProperty href)
         Invoke-WebRequest $webLocation -OutFile $TemporaryDownloadFile
         Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
     
