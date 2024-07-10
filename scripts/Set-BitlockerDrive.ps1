@@ -1,42 +1,77 @@
 function Set-BitlockerDrive {
-    #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
-    Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
-    if (((Get-BitLockerVolume -MountPoint c:).VolumeStatus) -eq 'FullyEncrypted') {
-        Write-Host "[*] Bitlocker is already enabled for Drive C:" -ForegroundColor Green
+    <#
+    .SYNOPSIS 
+        This script will check if Bitlocker is enabled and, if not, enable it.
+    .DESCRIPTION
+        This script will check if Bitlocker is enabled and, if not, enable it and output the recover information into a text file
+    .PARAMETER OEM
+        This is the OEM folder left over during the deployment process.
+            -Default value is $OEM = "C:\OEM"
+    .PARAMETER OEM
+        This is the Platform folder left over during the deployment process.
+            -Default value is $platform = "C:\Platform"
+#>
+    [CmdletBinding()]
+    param (
+
+        [Parameter()]
+        $Moundpoint = "C:",
+        
+        [Parameter()]
+        $SaveLocation = ".",
+
+        [Parameter()]
+        $Filename = $env:computername
+    )
+
+    begin {   
+        
     }
-    else {
-        Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
-        Enable-BitLocker -MountPoint "C:" -EncryptionMethod Aes256 -RecoveryPasswordProtector
-    }
-    $Bitlockerkey = (Get-BitLockerVolume -MountPoint C).KeyProtector |
+    
+    process {
+        #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
+        Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
+        if (((Get-BitLockerVolume -MountPoint $mountpoint).VolumeStatus) -eq 'FullyEncrypted') {
+            Write-Host "[*] Bitlocker is already enabled for Drive $Moundpoint" -ForegroundColor Green
+        }
+         else {
+            Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
+            Enable-BitLocker -MountPoint $mountpoint -EncryptionMethod Aes256 -RecoveryPasswordProtector
+        }
+        $Bitlockerkey = (Get-BitLockerVolume -MountPoint C).KeyProtector |
         Where-Object -Property KeyProtectorType -eq RecoveryPassword |
         Select-Object -Property KeyProtectorID,RecoveryPassword 
-    $blid = $bitlockerkey.KeyProtectorID
-    $blpw = $bitlockerkey.RecoveryPassword
-    $bitlockerfile = @"
-          BitLocker Drive Encryption recovery key
+        $blid = $bitlockerkey.KeyProtectorID
+        $blpw = $bitlockerkey.RecoveryPassword
+        $bitlockerfile = 
+@"
+                BitLocker Drive Encryption recovery key
 
-To verify that this is the correct recovery key, compare the start of the following identifier with
-the identifier value displayed on your PC.
+        To verify that this is the correct recovery key, compare the start of the following identifier with
+        the identifier value displayed on your PC.
 
-Identifier:
+        Identifier:
 
-	$blid
+	        $blid
 
-If the above identifier matches the one displayed by your PC, then use the following key to
-unlock your drive.
+        If the above identifier matches the one displayed by your PC, then use the following key to
+        unlock your drive.
 
-Recovery Key:
+        Recovery Key:
 
-	$blpw
+	        $blpw
 
-If the above identifier doesn't match the one displayed by your PC, then this isn't the right key
-to unlock your drive.
-Try another recovery key, or refer to https://go.microsoft.com/fwlink/?LinkID=260589 for
-additional assistance.
+        If the above identifier doesn't match the one displayed by your PC, then this isn't the right key
+        to unlock your drive.
+        Try another recovery key, or refer to https://go.microsoft.com/fwlink/?LinkID=260589 for
+        additional assistance.
 "@
     
-    $bitlockerfile> "$PSScriptroot\$computername.txt"
-    Write-Host "Bitlocker enabled. Bitlocker key is saved to $scriptroot\$computername.txt" -ForegroundColor Green
-    Write-Host "$Bitlockerkey" -ForegroundColor Yellow
+        $bitlockerfile> "$SaveLocation\$Filename.txt"
+        Write-Host "Bitlocker enabled. Bitlocker key is saved to $SaveLocation\$Filename.txt" -ForegroundColor Green
+        Write-Host "$Bitlockerkey" -ForegroundColor Yellow
+    }
+    end {
+
+    }
 }

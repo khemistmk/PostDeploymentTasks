@@ -1,10 +1,9 @@
 Function Install-OEMKey {
     <#
     .SYNOPSIS 
-        This script automates the Post Deployment process.
+        This script activates Microsoft Windows using the OEM product key from BIOS.
     .DESCRIPTION
-        This script aims to streamline and automate post-installation tasks by invoking several configurations and installations required for standard deployments.
-
+        This script activates Microsoft Windows by pulling the OEM product key from BIOS and activating Windows via the OEM key.
 #>
     [CmdletBinding()]
     param ()

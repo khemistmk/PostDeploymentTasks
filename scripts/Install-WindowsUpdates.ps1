@@ -10,18 +10,17 @@ function Install-WindowsUpdates {
     param ()
     
     begin {
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+        Install-Module -Name PSWindowsUpdate -Force
+        Import-Module PSWindowsUpdate
     }
     
     process {
     Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
-    Start-Process -Filepath "UsoClient.exe" -ArgumentList "ScanInstallWait" -Wait
-    Write-Host "[*] Installing Windows Updates..." -ForegroundColor Yellow
-    Start-Process -Filepath "UsoClient.exe" -ArgumentList "StartInstall" -Wait
-    Write-Host "[*] Reboot to complete Windows Updates..." -ForegroundColor Red  
-$WshShell = New-Object -comObject WScript. Shell $WshShell.RegWrite('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\InstallAtShutdown', '1', 'REG_DWORD')
-
-Restart-Computer 
+    Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnorReboot
+    Write-Host "[*] Windows Updates Completed" -ForegroundColor Green
     }
     end {
+        Remove-Module PSWindowsUpdate
     }
 }
