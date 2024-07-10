@@ -20,4 +20,8 @@ Function Uninstall-Package {
             Where-Object {$_.Name -like '*$PackageName*'}
             $installed.Uninstall()
             Write-Host "[*] $PackageName Uninstalled" -ForegroundColor Green
+        }
+        end {
+        
+        }
 }
