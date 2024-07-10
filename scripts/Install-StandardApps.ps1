@@ -13,23 +13,23 @@ Function Install-StandardApps {
     )
 
     begin {   
-        Install-Module -Name Microsoft.WinGet.Client
+        Install-Module -Name Microsoft.WinGet.Client -AcceptLicense
         $7zipWebsite = 'https://7-zip.org/'
         $TemporaryDownloadFile = $TemporaryDownloadFolder + "7zip.exe" 
     }
 
     process {
         Write-Host "[*] Installing Google Chrome..." - Foregroundcolor Yellow
-        winget install -e --id Google.Chrome
+        winget install -e --id Google.Chrome --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] Google Chrome installed." - Foregroundcolor Green
         Write-Host "[*] Installing Firefox..." - Foregroundcolor Yellow
-        winget install -e --id Mozilla.Firefox
+        winget install -e --id Mozilla.Firefox --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] Firefox installed." - Foregroundcolor Green
         Write-Host "[*] Installing VLC..." - Foregroundcolor Yellow
-        winget install -e --id VideoLAN.VLC
+        winget install -e --id VideoLAN.VLC --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] VLC installed." - Foregroundcolor Green
         Write-Host "[*] Installing Adobe Reader..." - Foregroundcolor Yellow
-        winget install -e --id Adobe.Acrobat.Reader.64-bit
+        winget install -e --id Adobe.Acrobat.Reader.64-bit --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] Adobe Reader installed." - Foregroundcolor Green
         Write-Host "[*] Installing 7zip..." - Foregroundcolor Yellow
         $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
