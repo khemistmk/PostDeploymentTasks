@@ -25,7 +25,7 @@ function Invoke-PostDeploymentTasks {
         function Defaultdeploy {
             Install-OEMKey
             Set-ComputerName
-            Set-AdminDisable
+            Disable-Administrator
             Set-PowerOptions
             Remove-DeploymentFiles
             Uninstall-SmartDeploy
