@@ -8,7 +8,7 @@ Function Install-StandardApps {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\7Zip\",
+        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\7Zip\"
         
     )
 
