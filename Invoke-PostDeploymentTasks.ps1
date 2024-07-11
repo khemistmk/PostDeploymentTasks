@@ -12,8 +12,7 @@ function Invoke-PostDeploymentTasks {
         [Validateset("Office 365","Office 2021")]
         $InstallOfficeVers,
         
-        [Parameter()]
-        [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
+        [Parameter()] [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
         $InstallPDFVers
     )
 
@@ -28,11 +27,13 @@ function Invoke-PostDeploymentTasks {
             Disable-Administrator
             Set-PowerOptions
             Remove-DeploymentFiles
-            Uninstall-SmartDeploy
-            Start-Ninite
+            Set-DotNet
+            Uninstall-Package
+            Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
-            Get-BitLockerVolume
+            Set-BitlockerDrive
+            Set-DefaultApps
         }
         if (-Not $InstallOfficevers.IsPresent -and -not $InstallPDFvers.Ispresent) {
             Defaultdeploy
