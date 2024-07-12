@@ -35,10 +35,14 @@ function Invoke-PostDeploymentTasks {
             Set-BitlockerDrive
             Set-DefaultApps
         }
-        if (-Not $InstallOfficevers.IsPresent -and -not $InstallPDFvers.Ispresent) {
             Defaultdeploy
         }
-        
+        if ($InstallOfficevers.IsPresent) {
+        Install-MSOffice -Officevers $InstallOfficevers
+        }
+        if ($InstallPDFvers.Ispresent) {
+        Install-PDF -PDFVers $InstallPDFVers
+        }
     }
 
     end {
