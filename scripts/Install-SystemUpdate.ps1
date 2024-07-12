@@ -25,7 +25,6 @@ Function Install-SystemUpdate {
 
     process {
         Write-Host "[*] Checking manufacturer..." -ForegroundColor Yellow
-        switch ($manufacturer){
             if ($Manufacturer -contains "Lenovo"){
             Write-Host "[*] Installing Lenovo System Update..." -ForegroundColor Yellow
             Start-Process -FilePath "$setupfolder\$systemupdate" -ArgumentList "/VERYSILENT /NORESTART" -Wait
@@ -46,5 +45,9 @@ Function Install-SystemUpdate {
         Start-Process -Filepath "$setupfolder\$HPIA" -ArgumentList "/s"
         Set-Location -FilePath "C:\SWSetup\SP140024"
         Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
+        }
+    }
+    end {
+        
     }
 }

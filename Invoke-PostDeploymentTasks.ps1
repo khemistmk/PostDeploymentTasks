@@ -17,11 +17,15 @@ function Invoke-PostDeploymentTasks {
     )
 
     begin {
-         Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
+        Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+        Install-Module nuget
+        Install-Module winget
+        Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
+
     }
 
     process {
-        function Defaultdeploy {
+        function Invoke-Defaultdeploy {
             Install-OEMKey
             Set-ComputerName
             Disable-Administrator
@@ -35,8 +39,7 @@ function Invoke-PostDeploymentTasks {
             Set-BitlockerDrive
             Set-DefaultApps
         }
-            Defaultdeploy
-        }
+        Invoke-Defaultdeploy
         if ($InstallOfficevers.IsPresent) {
         Install-MSOffice -Officevers $InstallOfficevers
         }

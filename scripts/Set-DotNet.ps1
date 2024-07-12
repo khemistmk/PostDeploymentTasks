@@ -1,4 +1,4 @@
-function Enable-DotNet {
+function Set-DotNet {
 <#
     .SYNOPSIS 
         This script will enable or disable .Net Framework.
