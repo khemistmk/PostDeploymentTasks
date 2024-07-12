@@ -17,7 +17,7 @@ function Invoke-PostDeploymentTasks {
     )
 
     begin {
-
+         Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
     }
 
     process {
