@@ -23,7 +23,7 @@ Function Install-MSOffice {
     }
 
     process {
-        if ($deployroot -neq $PSScriptRoot) {
+        if ($deployroot -ne $PSScriptRoot) {
             $deployconnect = Test-Path -Path $deployroot
         }
         if ($deployconnect -eq "True") {
