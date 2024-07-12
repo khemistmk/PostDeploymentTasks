@@ -12,7 +12,7 @@ Function Install-MSOffice {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$deployroot
+        [string]$deployroot,
 
         [Parameter()]
         [string]$officefolder 
