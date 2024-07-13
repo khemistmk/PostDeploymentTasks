@@ -14,52 +14,31 @@ Function Install-SystemUpdate {
         $systemupdate = "System Update.exe",
 
         [Parameter()]
-        $HPIA = "HPIA.exe",
+        $HPIA = "HPIA.exe"
         
-        [Parameter()]
-        $DellCommand = "DellCommand.exe"
+        #[Parameter()]
+        #$DellCommand = "DellCommand.exe"
     )
     begin {
+        Write-Host "[*] Checking manufacturer..." -ForegroundColor Yellow
         $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).Manufacturer
         }
 
     process {
-        Write-Host "[*] Checking manufacturer..." -ForegroundColor Yellow
-            if ($Manufacturer -contains "Lenovo"){
-              function global:au_GetLatest {
-                  $response = Invoke-RestMethod -Uri "https://download.lenovo.com/ibmdl/pub/pc/pccbbs/agent/SSClientCommon/HelloLevel_9_59_00.xml"
-                  if ($response.Length -gt 0) {
-        $xml = [xml] $response.Substring(3)
-        $version = $xml.LevelDescriptor.Version
-        $buildDate = $xml.LevelDescriptor.BuildDate
-    }
-    
-    $Latest = createLatest $version $buildDate
-
-    # Sometimes the version might be wrong, so check first
-    try {
-        Get-redirectedUri $Latest.URL32
-    }
-    catch {
-        # Fallback to scraping the webpage
-        $response = Invoke-WebRequest -Uri "https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation" -UseBasicParsing
-        $pattern = '(?<="Name":"Lenovo\ System\ Update")[\S\s]*,"Version":"(?<Version>[\d\.]+)'
-        $version = [regex]::Match($response.Content, $pattern).groups['Version'].value
-        $pattern = '(?<="Name":"Lenovo\ System\ Update")[\S\s]*,"Date":\{"Unix":(?<Date>\d+)\}'
-        $unixTime = [regex]::Match($response.Content, $pattern).groups['Date'].value
-        $buildDate = [System.DateTimeOffset]::FromUnixTimeMilliseconds($unixTime).DateTime.ToString("d MMM yyyy")
-        
-        $Latest = createLatest $version $buildDate
-    }
-
-    return $Latest
-}
-
-
-
-
+        if ($Manufacturer -contains "Lenovo"){
+            try {
+                Write-Host "[*] Downloading System Update..."
+                $response = Invoke-WebRequest -Uri "https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation" -UseBasicParsing
+                $pattern = '(?<="Name":"Lenovo\ System\ Update")[\S\s]*,"Version":"(?<Version>[\d\.]+)'
+                $version = [regex]::Match($response.Content, $pattern).groups['Version'].value
+                $LSU = "https://download.lenovo.com/pccbbs/thinkvantage_en/system_update_$version.exe"
+                Invoke-WebRequest -Uri $LSU -OutFile "$PSScriptRoot\$systemupdate.exe"
+            }
+            catch {
+                Write-Error -Message "Unable to download System Update"
+            }
             Write-Host "[*] Installing Lenovo System Update..." -ForegroundColor Yellow
-            Start-Process -FilePath "$setupfolder\$systemupdate" -ArgumentList "/VERYSILENT /NORESTART" -Wait
+            Start-Process -FilePath "$PSScriptRoot\$systemupdate.exe" -ArgumentList "/VERYSILENT /NORESTART" -Wait
             $RegKey = "HKLM:\SOFTWARE\Policies\Lenovo\System Update\UserSettings\General"
             $RegName = "AdminCommandLine"
             $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -noreboot -exporttowmi"    
@@ -74,9 +53,22 @@ Function Install-SystemUpdate {
             Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM"
         }
         elseif ($manufacturer -contains "HP"){
-        Start-Process -Filepath "$setupfolder\$HPIA" -ArgumentList "/s"
-        Set-Location -FilePath "C:\SWSetup\SP140024"
-        Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
+            try {
+                Write-Host "[*] Downloading HPIA..."
+                $response = Invoke-WebRequest -Uri "http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html" -UseBasicParsing
+                $HPIAlink = $response | Select-Object -ExpandProperty Links | Where-Object {$_.href -like "*.exe"} | Select-Object -ExpandProperty href  
+                $HPIAroot,$HPIAfile = $HPIA -split "/hpia/"
+                Invoke-WebRequest -Uri $HPIAlink -OutFile "$PSScriptroot\$HPIAfile"
+            }
+            catch {
+                Write-Error -Message "Unable to download HPIA"
+            }
+            Start-Process -Filepath "$PSScriptroot\$HPIAfile" -ArgumentList "/s"
+            Set-Location -FilePath "C:\SWSetup\SP140024"
+            Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
+        }
+        else {
+            Write-Host "[*] Unsupported Manufacturer $manufacturer" -ForegroundColor Red
         }
     }
     end {

@@ -37,7 +37,6 @@ function Invoke-PostDeploymentTasks {
             Install-SystemUpdate
             Install-WindowsUpdates
             Set-BitlockerDrive
-            Set-DefaultApps
         }
         Invoke-Defaultdeploy
         if ($InstallOfficevers.IsPresent) {

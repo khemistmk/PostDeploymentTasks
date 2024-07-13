@@ -14,21 +14,7 @@ function Invoke-PostDeploymentTasks {
     
         }
     
-        process {
-            $Adobe = $env
-
-            "Acrobat.XDPDoc"
-            $xml = @"
-                <?xml version="1.0" encoding="UTF-8"?>
-                <DefaultAssociations>
-                <Association Identifier=".htm" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
-                <Association Identifier=".html" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
-                <Association Identifier=".pdf" ProgId="Acrobat.XDPDoc" ApplicationName="Adobe Acrobat" />
-                <Association Identifier="http" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
-                <Association Identifier="https" ProgId="ChromeHTML" ApplicationName="Google Chrome" />
-                <Association Identifier="mailto" ProgId="Outlook.URL.mailto.15" ApplicationName="Outlook" />
-                </DefaultAssociations>
-"@
+        process {            
             
         }
     
