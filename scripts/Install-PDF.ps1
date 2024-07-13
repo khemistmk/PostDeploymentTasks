@@ -9,7 +9,7 @@ Function Install-PDF {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [Validateset("AdobeSTD2020","Adobe2020Pro","AdobeReader","FoxitBusiness")]
+        [Validateset("Adobe2020STD","Adobe2020Pro","AdobeReader","FoxitBusiness")]
         [string]$InstallPDFVers,
         
         [Parameter()]
@@ -21,7 +21,7 @@ Function Install-PDF {
     }
 
     process {
-        if ($InstallPDFVers -eq "AdobeSTD2020" -or "AdobePro2020") {
+        if ($InstallPDFVers -eq "Adobe2020STD" -or "Adobe2020Pro") {
             try {  
                 Write-Host "[*] Downloading Adobe files..." -ForegroundColor Yellow  
                 Invoke-WebRequest -Uri "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_2020_Web_WWMUI.zip" -Outfile "$downloadfolder\$InstallPDFVers.zip"
