@@ -26,8 +26,9 @@ Function Install-PDF {
                 Invoke-WebRequest -Uri "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_2020_Web_WWMUI.zip" -Outfile "$downloadfolder\$InstallPDFVers.zip"
                 Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
                 Expand-Archive -Path "$downloadfolder\$InstallPDFVers.zip"
-                Write-Host "[*] Installing $InstallPDFVers"
+                Write-Host "[*] Installing $InstallPDFVers..." -ForegroundColor Yellow
                 Start-Process -FilePath "$downloadfolder\$InstallPDFVers\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
+                Write-Host "[*] $InstallPDFVers installed." -ForegroundColor Green
             }
             catch {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
