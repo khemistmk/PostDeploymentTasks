@@ -12,27 +12,26 @@ Function Install-MSOffice {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$deployroot,
-
-        [Parameter()]
-        [string]$officefolder 
+        [ValidateSet("O365","O365-32","OHBE21","OHBE21-32","OHBE19","OHBE19-32")]
+        [string]$officevers
     )
 
     begin {
-        
+        switch ($officevers) {
+            'O365'{ $config = "Configuration-Office365Business.xml"}
+            'O365-32' {$config = "Configuration-Office365Business32.xml"}
+            'OHBE21' {$config = "Configuration-OfficeHBE2021.xml"}
+        }
     }
 
     process {
-        if ($deployroot -ne $PSScriptRoot) {
-            $deployconnect = Test-Path -Path $deployroot
-        }
-        if ($deployconnect -eq "True") {
-            Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
-            Copy-Item -Path "$deployroot\Microsoft Office\$officefolder" -Destination "$PSScriptRoot\$officefolder"
-            Set-Location -Path "$scriptroot\$officefolder"
+        
+        try {
+            $officefolder = "$((Get-Item $PSScriptRoot).Parent)\Assets\"
+            Set-Location -Path "$officefolder"
             Write-Host "[*] Installing Office..." -ForegroundColor Yellow
             Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
-            Set-Location -Path $scriptroot
+            Set-Location -Path $PSscriptroot
             $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
             if ($officeinstalled -eq "True") {
                 Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
@@ -43,27 +42,10 @@ Function Install-MSOffice {
                 Write-Error "[*] Microsoft Office Failed to install."
             }  
         }
-        elseif ($deployroot -eq $PSScriptRoot){
-            Set-Location -Path "$PSScriptRoot\$officefolder"
-            Write-Host "[*] Installing Office..." -ForegroundColor Yellow
-            Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
-            Set-Location -Path $scriptroot
-            $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
-            if ($officeinstalled -eq "True") {
-                Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
-                Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
-                Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
-            }
-            else {
-                Write-Error "[*] Microsoft Office Failed to install."
-            }
+        catch {
+            Write-Error "[*] Microsoft Office Failed to install."
         }
-        else {
-        Invoke-WebRequest "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_17531-20046.exe" -OutFile "$scriptroot\ODT.exe"
-        Start-Process -FilePath "$scriptroot\ODT.exe" -ArgumentList "/passive /extract:C:\temp\office\" -Wait
-        Move-Item -Path "C:\temp\office"-Destination "$scriptroot\Office"
-        Remove-Item -Path "C:\temp\office"
-        }
+     
     }
     end {
 
