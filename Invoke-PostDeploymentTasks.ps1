@@ -46,6 +46,7 @@ function Invoke-PostDeploymentTasks {
         if ($InstallPDFvers.Ispresent) {
         Install-PDF -PDFVers $InstallPDFVers
         }
+        Restart-Computer
     }
 
     end {
