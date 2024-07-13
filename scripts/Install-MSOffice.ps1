@@ -27,7 +27,7 @@ Function Install-MSOffice {
     process {
         
         try {
-            $officefolder = "$((Get-Item $PSScriptRoot).Parent)\Assets\"
+            $officefolder = "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\"
             Set-Location -Path "$officefolder"
             Write-Host "[*] Installing Office..." -ForegroundColor Yellow
             Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
