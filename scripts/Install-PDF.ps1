@@ -32,6 +32,7 @@ Function Install-PDF {
             catch {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
             }
+        }
         if ($InstallPDFVers -eq "AdobeReader"){
             try {
                 Write-Host "[*] Installing $InstallPDFVers..." -ForegroundColor Yellow
@@ -40,6 +41,7 @@ Function Install-PDF {
             catch {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
             }
+        }
         if ($InstallPDFVers -eq "FoxitBusiness") {
             try {
                 Write-Host "[*] Installing $$InstallPDFVers..." -ForegroundColor Yellow
