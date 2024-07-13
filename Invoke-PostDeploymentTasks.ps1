@@ -52,7 +52,7 @@ function Invoke-PostDeploymentTasks {
     }
 
     end {
-
+       Uninstall-Module nuget,winget
     }
 
 }
