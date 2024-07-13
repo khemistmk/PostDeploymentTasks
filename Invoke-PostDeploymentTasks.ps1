@@ -10,19 +10,17 @@ function Invoke-PostDeploymentTasks {
     param (
         [Parameter()]
         [ValidateSet("O365","O365-32","OHBE21","OHBE21-32","OHBE19","OHBE19-32")]
-        $InstallOfficeVers,
+        [string]$InstallOfficeVers,
         
         [Parameter()] [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
-        $InstallPDFVers
+        [string]$InstallPDFVers
     )
 
     begin {
         Write-Host "[*] Installing Prerequisites..." -ForegroundColor Yellow
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         Install-Module nuget 
--AcceptLicense
-        Install-Module winget 
--AcceptLicense
+        Install-Module winget
         Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
 
     }
@@ -42,10 +40,10 @@ function Invoke-PostDeploymentTasks {
             Set-BitlockerDrive C:
         }
         Invoke-Defaultdeploy
-        if ($InstallOfficevers.IsPresent) {
+        if ($InstallOfficevers) {
         Install-MSOffice -officevers $InstallOfficevers
         }
-        if ($InstallPDFvers.Ispresent) {
+        if ($InstallPDFvers) {
         Install-PDF -InstallPDFVers $InstallPDFVers
         }
         
