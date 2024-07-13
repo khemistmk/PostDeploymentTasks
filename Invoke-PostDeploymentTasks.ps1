@@ -19,8 +19,10 @@ function Invoke-PostDeploymentTasks {
     begin {
         Write-Host "[*] Installing Prerequisites..." -ForegroundColor Yellow
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
-        Install-Module nuget
-        Install-Module winget
+        Install-Module nuget 
+-AcceptLicense
+        Install-Module winget 
+-AcceptLicense
         Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
 
     }
