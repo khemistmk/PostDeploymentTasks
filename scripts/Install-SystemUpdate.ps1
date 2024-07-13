@@ -7,8 +7,8 @@ Function Install-SystemUpdate {
     #>
     [CmdletBinding()]
     param (
-        [Parameter(Mandatory=$true)]
-        $setupfolder,
+        [Parameter()]
+        $setupfolder = "$env:USERPROFILE\Downloads",
 
         [Parameter()]
         $systemupdate = "System Update.exe",
