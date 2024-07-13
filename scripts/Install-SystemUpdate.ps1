@@ -41,7 +41,7 @@ Function Install-SystemUpdate {
             Start-Process -FilePath "$PSScriptRoot\$systemupdate.exe" -ArgumentList "/VERYSILENT /NORESTART" -Wait
             $RegKey = "HKLM:\SOFTWARE\Policies\Lenovo\System Update\UserSettings\General"
             $RegName = "AdminCommandLine"
-            $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -exporttowmi"    
+            $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -noreboot -exporttowmi"    
             # Create Subkeys if they don't exist
             if (!(Test-Path $RegKey)) {
                 New-Item -Path $RegKey -Force | Out-Null
@@ -50,6 +50,7 @@ Function Install-SystemUpdate {
             else {
                 New-ItemProperty -Path $RegKey -Name $RegName -Value $RegValue -Force | Out-Null
             } 
+            Write-Host "[*] Running Lenovo System Update..." -ForegroundColor Yellow
             Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM"
         }
         elseif ($manufacturer -contains "HP"){
@@ -63,6 +64,7 @@ Function Install-SystemUpdate {
             catch {
                 Write-Error -Message "Unable to download HPIA"
             }
+            Write-Host "[*] Running HPIA..." -ForegroundColor Yellow
             Start-Process -Filepath "$PSScriptroot\$HPIAfile" -ArgumentList "/s"
             Set-Location -FilePath "C:\SWSetup\SP140024"
             Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"

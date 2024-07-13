@@ -28,9 +28,6 @@ Function Install-StandardApps {
         Write-Host "[*] Installing VLC..." -Foregroundcolor Yellow
         winget install -e --id VideoLAN.VLC --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] VLC installed." -Foregroundcolor Green
-        Write-Host "[*] Installing Adobe Reader..." -Foregroundcolor Yellow
-        winget install -e --id Adobe.Acrobat.Reader.64-bit --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Adobe Reader installed." -Foregroundcolor Green
         Write-Host "[*] Installing 7zip..." -Foregroundcolor Yellow
         $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
             Select-Object -ExpandProperty Links | 

@@ -24,9 +24,9 @@ Function Set-ComputerName {
         else {
         Rename-Computer -newname "$serialnumber"
         }
-        Write-Host "[*] Computer name set to $computername" -ForegroundColor Green
+        
     }
     end {
-
+        Write-Host "[*] Computer name set to $computername" -ForegroundColor Green
     }
 }
