@@ -18,7 +18,7 @@ Function Uninstall-Package {
         }
 
         process {
-            $installed = Get-WmiObjecdt -Class Win32_Product |
+            $installed = Get-WmiObject -Class Win32_Product |
             Where-Object {$_.Name -like '*$PackageName*'}
             $installed.Uninstall()
             Write-Host "[*] $PackageName Uninstalled" -ForegroundColor Green

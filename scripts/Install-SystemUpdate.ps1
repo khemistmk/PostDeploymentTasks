@@ -41,7 +41,7 @@ Function Install-SystemUpdate {
             Start-Process -FilePath "$PSScriptRoot\$systemupdate.exe" -ArgumentList "/VERYSILENT /NORESTART" -Wait
             $RegKey = "HKLM:\SOFTWARE\Policies\Lenovo\System Update\UserSettings\General"
             $RegName = "AdminCommandLine"
-            $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -noreboot -exporttowmi"    
+            $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -exporttowmi"    
             # Create Subkeys if they don't exist
             if (!(Test-Path $RegKey)) {
                 New-Item -Path $RegKey -Force | Out-Null

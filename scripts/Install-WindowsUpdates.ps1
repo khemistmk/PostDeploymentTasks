@@ -17,7 +17,7 @@ function Install-WindowsUpdates {
     
     process {
     Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
-    Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnorReboot
+    Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot
     Write-Host "[*] Windows Updates Completed" -ForegroundColor Green
     }
     end {

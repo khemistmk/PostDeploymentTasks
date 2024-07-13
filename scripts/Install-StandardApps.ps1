@@ -13,7 +13,7 @@ Function Install-StandardApps {
     )
 
     begin {   
-        Install-Module -Name Microsoft.WinGet.Client -AcceptLicense
+        Install-Module -Name Microsoft.WinGet.Client
         $7zipWebsite = 'https://7-zip.org/'
         $TemporaryDownloadFile = $TemporaryDownloadFolder + "7zip.exe" 
     }
@@ -42,6 +42,6 @@ Function Install-StandardApps {
     
     }
     end {
-    Remove-Item $TemporaryDownloadFolder -Recurse -Force
+    
     }
 }

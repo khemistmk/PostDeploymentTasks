@@ -17,6 +17,7 @@ function Invoke-PostDeploymentTasks {
     )
 
     begin {
+        Write-Host "[*] Installing Prerequisites..." -ForegroundColor Yellow
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         Install-Module nuget
         Install-Module winget
@@ -31,8 +32,8 @@ function Invoke-PostDeploymentTasks {
             Disable-Administrator
             Set-PowerOptions
             Remove-DeploymentFiles
-            Set-DotNet
-            Uninstall-Package
+            Set-DotNet -setdotnet3 Enabled -setdotnet4 Enabled
+            Uninstall-Package -PackageName "SmartDeploy"
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
