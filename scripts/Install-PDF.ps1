@@ -27,7 +27,7 @@ Function Install-PDF {
                 Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
                 Expand-Archive -Path "$downloadfolder\$InstallPDFVers.zip"
                 Write-Host "[*] Installing $InstallPDFVers"
-                Start-Process -FilePath "$downloadfolder\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
+                Start-Process -FilePath "$downloadfolder\$InstallPDFVers\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
             }
             catch {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
