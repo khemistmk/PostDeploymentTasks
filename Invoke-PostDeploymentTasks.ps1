@@ -9,7 +9,7 @@ function Invoke-PostDeploymentTasks {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [Validateset("Office365","Office2021")]
+        [ValidateSet("O365","O365-32","OHBE21","OHBE21-32","OHBE19","OHBE19-32")]
         $InstallOfficeVers,
         
         [Parameter()] [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
