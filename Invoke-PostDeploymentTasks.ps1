@@ -37,7 +37,7 @@ function Invoke-PostDeploymentTasks {
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
-            Set-BitlockerDrive
+            Set-BitlockerDrive C:
         }
         Invoke-Defaultdeploy
         if ($InstallOfficevers.IsPresent) {
