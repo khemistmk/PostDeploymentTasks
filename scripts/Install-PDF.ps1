@@ -31,6 +31,7 @@ Function Install-PDF {
             }
             catch {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
+            }
         if ($InstallPDFVers -eq "AdobeReader"){
             try {
                 Write-Host "[*] Installing $InstallPDFVers..." -ForegroundColor Yellow
