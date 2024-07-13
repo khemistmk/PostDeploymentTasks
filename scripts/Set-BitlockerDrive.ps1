@@ -15,10 +15,10 @@ function Set-BitlockerDrive {
     param (
 
         [Parameter()]
-        $Moundpoint = "C:",
+        $moundpoint = "C:",
         
         [Parameter()]
-        $SaveLocation = ".",
+        $SaveLocation = "$env:USERPROFILE\Documents",
 
         [Parameter()]
         $Filename = $env:computername
