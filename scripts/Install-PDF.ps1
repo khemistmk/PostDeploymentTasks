@@ -9,7 +9,7 @@ Function Install-PDF {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$officefolder 
+        [string]$officefolder, 
 
         [Parameter()]
         [string]$deployroot
@@ -19,7 +19,7 @@ Function Install-PDF {
     }
 
     process {
-        if ($deployroot -neq $PSScriptRoot) {
+        if ($deployroot -ne $PSScriptRoot) {
             $deployconnect = Test-Path -Path $deployroot
         }
         $scriptroot = $PSScriptroot
