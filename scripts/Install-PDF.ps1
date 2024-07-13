@@ -17,6 +17,7 @@ Function Install-PDF {
 )
 
     begin {
+        Import-module bitstransfer
     }
 
     process {
