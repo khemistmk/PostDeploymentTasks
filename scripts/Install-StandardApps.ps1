@@ -19,13 +19,13 @@ Function Install-StandardApps {
 
     process {
         Write-Host "[*] Installing Google Chrome..." -Foregroundcolor Yellow
-        winget install -e --id Google.Chrome --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
+        winget install -e --id Google.Chrome --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] Google Chrome installed." -Foregroundcolor Green
         Write-Host "[*] Installing Firefox..." -Foregroundcolor Yellow
-        winget install -e --id Mozilla.Firefox --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
+        winget install -e --id Mozilla.Firefox --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] Firefox installed." -Foregroundcolor Green
         Write-Host "[*] Installing VLC..." -Foregroundcolor Yellow
-        winget install -e --id VideoLAN.VLC --disable-interactivity --silent --accept-source-agreements --accept-package-agreements
+        winget install -e --id VideoLAN.VLC --silent --accept-source-agreements --accept-package-agreements
         Write-Host "[*] VLC installed." -Foregroundcolor Green
         Write-Host "[*] Installing 7zip..." -Foregroundcolor Yellow
         $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
