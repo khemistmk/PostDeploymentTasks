@@ -9,70 +9,42 @@ Function Install-PDF {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$officefolder, 
-
+        [Validateset("AdobeSTD2020","Adobe2020Pro","AdobeReader","FoxitBusiness")]
+        [string]$InstallPDFVers,
+        
         [Parameter()]
-        [string]$deployroot
+        $downloadfolder = "$env:USERPROFILE\Downloads"
 )
 
     begin {
     }
 
     process {
-        if ($deployroot -ne $PSScriptRoot) {
-            $deployconnect = Test-Path -Path $deployroot
+        if ($InstallPDFVers -eq "AdobeSTD2020" -or "AdobePro2020") {
+            try {  
+                Write-Host "[*] Downloading Adobe files..." -ForegroundColor Yellow  
+                Invoke-WebRequest -Uri "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_2020_Web_WWMUI.zip" -Outfile "$downloadfolder\$InstallPDFVers.zip"
+                Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
+                Expand-Archive -Path "$downloadfolder\$InstallPDFVers.zip"
+                Write-Host "[*] Installing $InstallPDFVers"
+                Start-Process -FilePath "$downloadfolder\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
+            }
+            catch {
+                Write-Error -message "[*] Unable to install $InstallPDFVers"
+        if ($InstallPDFVers -eq "AdobeReader"){
+            try {
+                Write-Host "[*] Installing $InstallPDFVers..." -ForegroundColor Yellow
+                winget install -e --id Adobe.Acrobat.Reader.32-bit
+            }
+            catch {
+                Write-Error -message "[*] Unable to install $InstallPDFVers"
+        if ($InstallPDFVers -eq "FoxitBusiness") {
+            try {
+                Write-Host "[*] Installing $$InstallPDFVers..." -ForegroundColor Yellow
+            }
+            catch {
+            }
         }
-        $scriptroot = $PSScriptroot
-        $deployconnect = Test-Path -Path $deployroot
-        if ($deployconnect -eq "True") {
-        Write-Host "[*] Copying Office Files" -ForegroundColor Yellow
-        Copy-Item -Path "$deployroot\Microsoft Office\$officefolder" -Destination "$scriptroot\$officefolder"
-        Set-Location -Path "$scriptroot\$officefolder"
-        Write-Host "[*] Installing Office..." -ForegroundColor Yellow
-        Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
-        Set-Location -Path $scriptroot
-        $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
-        if ($officeinstalled -eq "True") {
-            Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
-            Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
-            Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
-        }
-        else {
-            Write-Error "[*] Microsoft Office Failed to install."
-        }
-        Write-Host "[*] Copying Adobe files..." -ForegroundColor Yellow  
-        Copy-Item -Path $PDFDeploy -Destination $scriptroot
-        Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
-        Expand-Archive -Path "$scriptroot\$PDFzip"
-        Write-Host "[*] Installing $PDFFolder"
-        Start-Process -FilePath "$scriptroot\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
-    }
-    elseif (Test-Path -Path "$scriptroot\Office*\Setup*"){
-        Set-Location -Path "$scriptroot\$officefolder"
-        Write-Host "[*] Installing Office..." -ForegroundColor Yellow
-        Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
-        Set-Location -Path $scriptroot
-        $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
-        if ($officeinstalled -eq "True") {
-            Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
-            Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
-            Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
-        }
-        else {
-            Write-Error "[*] Microsoft Office Failed to install."
-        }
-        Write-Host "[*] Extracting Adobe files..." -ForegroundColor Yellow
-        Expand-Archive -Path "$scriptroot\$PDFzip"
-        Write-Host "[*] Installing $PDFFolder"
-        Start-Process -FilePath "$scriptroot\Adobe Acrobat\Setup.exe" -ArgumentList "/sl","1133","/sAll","/msi"
-    }
-
-    else {
-        Invoke-WebRequest "https://download.microsoft.com/download/2/7/A/27AF1BE6-DD20-4CB4-B154-EBAB8A7D4A7E/officedeploymenttool_17531-20046.exe" -OutFile "$scriptroot\ODT.exe"
-        Start-Process -FilePath "$scriptroot\ODT.exe" -ArgumentList "/passive /extract:C:\temp\office\" -Wait
-        Move-Item -Path "C:\temp\office"-Destination "$scriptroot\Office"
-        Remove-Item -Path "C:\temp\office"
-    }
     }
     end {
     }
