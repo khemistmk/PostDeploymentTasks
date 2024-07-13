@@ -43,16 +43,17 @@ function Invoke-PostDeploymentTasks {
         }
         Invoke-Defaultdeploy
         if ($InstallOfficevers.IsPresent) {
-        Install-MSOffice -Officevers $InstallOfficevers
+        Install-MSOffice -officevers $InstallOfficevers
         }
         if ($InstallPDFvers.Ispresent) {
-        Install-PDF -PDFVers $InstallPDFVers
+        Install-PDF -InstallPDFVers $InstallPDFVers
         }
-        Restart-Computer
+        
     }
 
     end {
        Uninstall-Module nuget,winget
+       Restart-Computer
     }
 
 }
