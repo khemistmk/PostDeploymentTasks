@@ -32,7 +32,7 @@ function Set-BitlockerDrive {
         #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
         Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
         if (((Get-BitLockerVolume -MountPoint "$mountpoint").VolumeStatus) -eq 'FullyEncrypted') {
-            Write-Host "[*] Bitlocker is already enabled for Drive $Moundpoint" -ForegroundColor Green
+            Write-Host "[*] Bitlocker is already enabled for Drive $moundpoint" -ForegroundColor Green
         }
          else {
             Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
