@@ -21,7 +21,7 @@ Function Install-PDF {
     }
 
     process {
-        if ($InstallPDFVers -eq "Adobe2020STD" -or "Adobe2020Pro") {
+        if ($InstallPDFVers -eq "Adobe2020STD" -or $InstallPDFVers -eq "Adobe2020Pro") {
             try {  
                 Write-Host "[*] Downloading Adobe files..." -ForegroundColor Yellow  
                 Invoke-WebRequest -Uri "https://trials.adobe.com/AdobeProducts/APRO/Acrobat_HelpX/win32/Acrobat_2020_Web_WWMUI.zip" -Outfile "$downloadfolder\$InstallPDFVers.zip"
@@ -35,7 +35,7 @@ Function Install-PDF {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
             }
         }
-        if ($InstallPDFVers -eq "AdobeReader"){
+        elseif ($InstallPDFVers -eq "AdobeReader"){
             try {
                 Write-Host "[*] Installing $InstallPDFVers..." -ForegroundColor Yellow
                 winget install -e --id Adobe.Acrobat.Reader.32-bit
@@ -44,12 +44,15 @@ Function Install-PDF {
                 Write-Error -message "[*] Unable to install $InstallPDFVers"
             }
         }
-        if ($InstallPDFVers -eq "FoxitBusiness") {
+        elseif ($InstallPDFVers -eq "FoxitBusiness") {
             try {
                 Write-Host "[*] Installing $$InstallPDFVers..." -ForegroundColor Yellow
             }
             catch {
             }
+        }
+        else {
+            Write-Error -message "[*] Unable to install $InstallPDFVers."
         }
     }
     end {
