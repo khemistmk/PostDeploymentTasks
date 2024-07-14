@@ -27,7 +27,7 @@ function Set-DefaultApps {
             elseif (Test-Path "$Programs\$AdobeAcrobat") { $PDF = "AdobeAcrobat" }
             elseif (Test-Path "$Programs\$AdobeReader") { $PDF = "AdobeReader" }
             else { $PDF = "Chrome" }
-            $config = "$Browser$Mail$PDF.xml
+            $config = "$Browser$Mail$PDF.xml"
             try {
                 DISM /Online /DefaultAppAssociations:$path\$config
         }
