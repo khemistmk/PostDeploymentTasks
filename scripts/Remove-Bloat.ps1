@@ -1,31 +1,22 @@
 Function Remove-Bloat {
 <#
     .SYNOPSIS 
-        This script will delete remnant folders left over from a deployment process.
+        This script will remove unneeded apps
     .DESCRIPTION
-        This script will delete remnant folders left over from a deployment process.
-    .PARAMETER OEM
-        This is the OEM folder left over during the deployment process.
-            -Default value is $OEM = "C:\OEM"
-    .PARAMETER OEM
-        This is the Platform folder left over during the deployment process.
-            -Default value is $platform = "C:\Platform"
+        This script will remove unneeded apps listed in \Assets\Applist.txt
 #>
     [CmdletBinding()]
     param (
-        [Parameter()]
-        $OEM = "C:\OEM",
-
-        [Parameter()]
-        $platform = "C:\Platform"
     )
 
     begin {   
-
+        $applist = Get-Content "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\Applist.txt"
+        $WinVersion = [System.Environment]::OSVersion.Version.Build
     }
 
     process {
-        Write-Host "[*] Removing OEM and Platform folders..." -ForegroundColor Yellow
+        foreach ($app in $applist) {
+            Write-Host "[*] Removing Bloat Apps..." -ForegroundColor Yellow
             if ($WinVersion -ge 22000){
                 # Windows 11 build 22000 or later
                 Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers
