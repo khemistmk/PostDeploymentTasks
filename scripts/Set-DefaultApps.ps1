@@ -17,7 +17,7 @@ function Set-DefaultApps {
             $AdobeAcrobat = "Adobe Acrobat.lnk"
             $Foxit = "Foxit Editor.lnk"
             $Outlook = "Outlook.lnk"
-            $path = "$(($PSSCRIPTROOT).Parent.FullName)\Assests"
+            $path = "$($PSSCRIPTROOT.Parent.FullName)\Assests"
         }
     
         process {           
