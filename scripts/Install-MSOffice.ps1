@@ -35,8 +35,6 @@ Function Install-MSOffice {
             $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
             if ($officeinstalled -eq "True") {
                 Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
-                Write-Host "[*] Running Microsoft Office Updates..." -ForegroundColor Yellow
-                Start-Process -FilePath "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe" -ArgumentList "/update user"
             }
             else {
                 Write-Error "[*] Microsoft Office Failed to install."
