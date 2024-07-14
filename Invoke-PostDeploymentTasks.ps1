@@ -34,7 +34,6 @@ function Invoke-PostDeploymentTasks {
             Remove-DeploymentFiles
             Set-DotNet -setdotnet3 Enabled -setdotnet4 Enabled
             Uninstall-Package -PackageName "SmartDeploy"
-            Remove-Bloat
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
@@ -47,6 +46,8 @@ function Invoke-PostDeploymentTasks {
         if ($InstallPDFvers) {
         Install-PDF -InstallPDFVers $InstallPDFVers
         }
+        Remove-Bloat
+        Set-DefaultApps
         
     }
 
