@@ -16,7 +16,7 @@ Function Remove-Bloat {
 
     process {
         foreach ($app in $applist) {
-            Write-Host "[*] Removing Bloat Apps..." -ForegroundColor Yellow
+            Write-Host "[*] Removing app $app" -ForegroundColor Yellow
             if ($WinVersion -ge 22000){
                 # Windows 11 build 22000 or later
                 Get-AppxPackage -Name $app -AllUsers | Remove-AppxPackage -AllUsers
