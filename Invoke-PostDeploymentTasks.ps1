@@ -34,6 +34,7 @@ function Invoke-PostDeploymentTasks {
         else {
             Install-Module -Name Microsoft.WinGet.Client
         }
+        Install-Module -Name PSWINDOWSUPDATE
         Import-Module $PSScriptRoot\PostDeploymentTasks.psm1
 
     }
@@ -67,7 +68,7 @@ function Invoke-PostDeploymentTasks {
     }
 
     end {
-       Uninstall-Module nuget,winget
+       Uninstall-Module -Name PSWINDOWSUPDATE
        Restart-Computer
     }
 
