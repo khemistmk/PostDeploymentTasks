@@ -20,7 +20,7 @@ function Set-DefaultApps {
             $path = "$(($PSSCRIPTROOT).Parent.FullName)\Assests"
         }
     
-        process {            
+        process {           
             if (Test-Path "$Programs\$Chrome") { $Browser = "Chrome" }
             if (Test-Path "$Programs\$Outlook") { $Mail = "Outlook" }
             if (Test-Path "$Programs\$Foxit") { $PDF = "Foxit" }
@@ -29,7 +29,12 @@ function Set-DefaultApps {
             else { $PDF = "Chrome" }
             $config = "$Browser$Mail$PDF.xml"
             try {
+                Write-Host "[*] Setting Default Apps..." -ForegroundColor Yellow 
                 DISM /Online /DefaultAppAssociations:$path\$config
+                Write-Host "[*] Default Apps set." -ForegroundColor Green
+            }
+            catch {
+                Write-Error-message "[*] Unable to set Default Apps."
         }
     
         end {
