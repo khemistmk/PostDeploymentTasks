@@ -69,9 +69,18 @@ Function Install-SystemUpdate {
             Set-Location -FilePath "C:\SWSetup\SP140024"
             Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
         }
+        elseif ($manufacturer -contains "Dell"){
+            Write-Host "[*] Downloading Dell Command" -ForegroundColor Yellow
+            winget install -e --id Dell.CommandUpdate --accept-source-agreements --accept-package-agreements
+            $DcuClipath = "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe"
+            Start-Process -FilePath $DcuCliPath -ArgumentList "/applyUpdates -updateType=bios -reboot=disable" -NoNewWindow -PassThru -Wait -ErrorAction SilentlyContinue
+            Start-Process -FilePath $DcuCliPath -ArgumentList "/applyUpdates -updateType=firmware -reboot=disable" -NoNewWindow -PassThru -Wait -ErrorAction SilentlyContinue
+            Start-Process -FilePath $DcuCliPath -ArgumentList "/applyUpdates -updateType=driver -reboot=disable" -NoNewWindow -PassThru -Wait -ErrorAction SilentlyContinue
+        }
         else {
             Write-Host "[*] Unsupported Manufacturer $manufacturer" -ForegroundColor Red
         }
+
     }
     end {
         
