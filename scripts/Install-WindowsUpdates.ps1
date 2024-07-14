@@ -23,6 +23,7 @@ function Install-WindowsUpdates {
         }
         catch {
             Write-Error -message "[*] Unable to run Windows Updates"
+        }
     }
     end {
         Uninstall-Module PSWindowsUpdate
