@@ -35,6 +35,7 @@ function Set-DefaultApps {
             }
             catch {
                 Write-Error-message "[*] Unable to set Default Apps."
+            }
         }
     
         end {
