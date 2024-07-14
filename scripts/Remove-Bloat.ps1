@@ -31,7 +31,8 @@ Function Remove-Bloat {
         }    
         New-Item -ItemType Directory -Force -Path C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState | Out-Null
         #Copies start.bin  
-        Copy-Item -path "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\\start.bin" -Destination "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\" 
+        Copy-Item -path "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\\start.bin" -Destination "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\"
+         Copy-Item -path "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\\start2.bin" -Destination "C:\Users\Default\AppData\Local\Packages\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\LocalState\"
     }
     end{
 
