@@ -10,8 +10,6 @@ function Install-WindowsUpdates {
     param ()
     
     begin {
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
-        Install-Module -Name PSWindowsUpdate -Force
         Import-Module PSWindowsUpdate
     }
     
