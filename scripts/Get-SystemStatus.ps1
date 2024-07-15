@@ -16,7 +16,7 @@ function Get-SystemStatus {
     }
 
     process {
-        
+        if ($adminaccount.Enabled -eq "False") { $Admin = "Administrator Disabled"}
 
 
         $Report = @"
@@ -42,7 +42,6 @@ Installed Software:
 $Software
 "@
 
-        }
     }
     end {
 

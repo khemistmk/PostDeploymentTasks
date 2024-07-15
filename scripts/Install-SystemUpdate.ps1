@@ -58,7 +58,7 @@ Function Install-SystemUpdate {
                 Write-Host "[*] Downloading HPIA..."
                 $response = Invoke-WebRequest -Uri "http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html" -UseBasicParsing
                 $HPIAlink = $response | Select-Object -ExpandProperty Links | Where-Object {$_.href -like "*.exe"} | Select-Object -ExpandProperty href  
-                $HPIAroot,$HPIAfile = $HPIA -split "/hpia/"
+                $HPIAroot,$HPIAfile = $HPIAlink -split "/hpia/"
                 Invoke-WebRequest -Uri $HPIAlink -OutFile "$PSScriptroot\$HPIAfile"
             }
             catch {
@@ -66,7 +66,7 @@ Function Install-SystemUpdate {
             }
             Write-Host "[*] Running HPIA..." -ForegroundColor Yellow
             Start-Process -Filepath "$PSScriptroot\$HPIAfile" -ArgumentList "/s"
-            Set-Location -FilePath "C:\SWSetup\SP140024"
+            Set-Location -FilePath "C:\SWSetup\SP151464"
             Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
         }
         elseif ($manufacturer -contains "Dell"){
