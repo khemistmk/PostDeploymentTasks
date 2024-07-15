@@ -13,9 +13,6 @@ function Set-BitlockerDrive {
 #>
     [CmdletBinding()]
     param (
-
-        [Parameter()]
-        $moundpoint = "C:",
         
         [Parameter()]
         $SaveLocation = "$env:USERPROFILE\Documents",
@@ -31,14 +28,14 @@ function Set-BitlockerDrive {
     process {
         #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
         Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
-        if (((Get-BitLockerVolume -MountPoint "$mountpoint").VolumeStatus) -eq 'FullyEncrypted') {
-            Write-Host "[*] Bitlocker is already enabled for Drive $moundpoint" -ForegroundColor Green
+        if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
+            Write-Host "[*] Bitlocker is already enabled for Drive C:" -ForegroundColor Green
         }
          else {
             Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
-            Enable-BitLocker -MountPoint "$mountpoint" -EncryptionMethod Aes256 -RecoveryPasswordProtector
+            Enable-BitLocker -MountPoint "C:" -RecoveryPasswordProtector -UsedSpaceOnly -SkipHardwareTest
         }
-        $Bitlockerkey = (Get-BitLockerVolume -MountPoint "$mountpoint").KeyProtector |
+        $Bitlockerkey = (Get-BitLockerVolume -MountPoint "C:").KeyProtector |
         Where-Object -Property KeyProtectorType -eq RecoveryPassword |
         Select-Object -Property KeyProtectorID,RecoveryPassword 
         $blid = $bitlockerkey.KeyProtectorID
