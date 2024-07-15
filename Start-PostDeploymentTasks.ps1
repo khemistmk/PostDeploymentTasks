@@ -1,3 +1,3 @@
 Set-ExecutionPolicy Bypass
 . .\Invoke-PostDeploymentTasks.ps1
-Invoke-PostDeploymentTasks
+Invoke-PostDeploymentTasks -InstallOfficeVers O365 InstallPDFVers Adobe2020STD
