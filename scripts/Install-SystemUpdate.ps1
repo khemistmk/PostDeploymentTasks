@@ -66,10 +66,9 @@ Function Install-SystemUpdate {
             }
             Write-Host "[*] Running HPIA..." -ForegroundColor Yellow
             Start-Process -Filepath "$PSScriptroot\$HPIAfile" -ArgumentList "/s"
-            Set-Location -FilePath "C:\SWSetup\SP151464"
-            Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Action:Install /AutoCleanup /Category:BIOS, Drivers,Firmware /Silent"
-        }
-        elseif ($manufacturer -contains "Dell"){
+            $swpath = "C:\SWSetup\SP151464"
+            Start-Process -FilePath "HPImageAssistant.exe" -ArgumentList "/Operation:Analyze", "/Category:All", "/selection:All", "/action:install", "/silent", "/reportFolder:c:\temp\HPIA\Report", "/softpaqdownloadfolder:c:\temp\HPIA\download"
+            elseif ($manufacturer -contains "Dell"){
             Write-Host "[*] Downloading Dell Command" -ForegroundColor Yellow
             winget install -e --id Dell.CommandUpdate --accept-source-agreements --accept-package-agreements
             $DcuClipath = "C:\Program Files (x86)\Dell\CommandUpdate\dcu-cli.exe"
@@ -80,8 +79,8 @@ Function Install-SystemUpdate {
         else {
             Write-Host "[*] Unsupported Manufacturer $manufacturer" -ForegroundColor Red
         }
-
     }
+
     end {
         
     }
