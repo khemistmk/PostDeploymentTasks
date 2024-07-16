@@ -13,7 +13,7 @@ function Invoke-PostDeploymentTasks {
         [string]$InstallOfficeVers,
         
         [Parameter()] 
-        [Validateset("AdobeReader","Adobe2020STD","Adobe2020Pro","FoxitBusiness")]
+        [Validateset("AdobeReader","Adobe2020","FoxitBusiness")]
         [string]$InstallPDFVers
     )
 
@@ -45,8 +45,7 @@ function Invoke-PostDeploymentTasks {
         if ($InstallOfficevers) {
         Install-MSOffice -officevers $InstallOfficevers
         }
-        if ($InstallPDFVers) {Return}
-        if ($InstallPDFvers -Like "*A*" -or $InstallPDFVers -like "*F*") {
+        if ($InstallPDFvers) {
         Install-PDF -InstallPDFVers $InstallPDFVers
         }
         Remove-Bloat
@@ -56,11 +55,12 @@ function Invoke-PostDeploymentTasks {
 
     end {
        
-        if ($Host.Name -eq "ConsoleHost")
-{
+        if ($Host.Name -eq "ConsoleHost") {
+            Clear-Host
+            Get-SystemStatus
             Write-Host "Press any key to continue..."
-             $Host.UI.RawUI.FlushInputBuffer()
-                 $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
+            $Host.UI.RawUI.FlushInputBuffer()
+            $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
 }
        Uninstall-Module -Name PSWINDOWSUPDATE
        Restart-Computer
