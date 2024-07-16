@@ -21,6 +21,8 @@ function Get-SystemStatus {
         $MSOfficeActivationEmail = $serialnumber + "@tuscom.us"
         $adminaccount = Get-LocalUser -Name "Administrator"
         $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*")}).Name
+        $CPUInfo = (Get-CimInstance Win32_Processor).name
+        $RAM = Get-CimInstance win32_ComputerSystem | foreach {[math]::round($_.TotalPhysicalMemory /1GB)}
     }
 
     process {
@@ -51,8 +53,8 @@ ______________________________________________________________
 Manufacturer:               $manufacturer
 Model:                      $model
 CPU:                        $CPUInfo
-RAM:                        $RAM
-Drive:                      $Drive $Drivemanufacturer
+RAM:                        $RAM GB
+Drive:                      $Drive GB $Drivemanufacturer
 
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
