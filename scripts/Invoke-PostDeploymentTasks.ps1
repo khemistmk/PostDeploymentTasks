@@ -54,12 +54,10 @@ function Invoke-PostDeploymentTasks {
             Set-BitlockerDrive C:
         }
         Invoke-Defaultdeploy
-        if ($InstallOfficeVers -eq "None") {Return}
-        if ($InstallOfficevers -Like "*O*") {
+        if ($InstallOfficevers) {
         Install-MSOffice -officevers $InstallOfficevers
         }
-        if ($InstallPDFVers -eq "None") {Return}
-        if ($InstallPDFvers -Like "*A*" -or $InstallPDFVers -like "*F*") {
+        if ($InstallPDFvers) {
         Install-PDF -InstallPDFVers $InstallPDFVers
         }
         Remove-Bloat
