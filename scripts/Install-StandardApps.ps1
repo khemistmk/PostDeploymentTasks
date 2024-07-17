@@ -10,6 +10,8 @@ Function Install-StandardApps {
         [Parameter()]
         [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\"
         
+        [Parameter()]
+        [string[]]$applist = "Google.Chrome", "Mozilla.Firefox", "VideoLAN.VLC", "7zip"
     )
 
     begin {
@@ -18,24 +20,23 @@ Function Install-StandardApps {
     }
 
     process {
-        Write-Host "[*] Installing Google Chrome..." -Foregroundcolor Yellow
-        winget install -e --id Google.Chrome --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Google Chrome installed." -Foregroundcolor Green
-        Write-Host "[*] Installing Firefox..." -Foregroundcolor Yellow
-        winget install -e --id Mozilla.Firefox --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] Firefox installed." -Foregroundcolor Green
-        Write-Host "[*] Installing VLC..." -Foregroundcolor Yellow
-        winget install -e --id VideoLAN.VLC --silent --accept-source-agreements --accept-package-agreements
-        Write-Host "[*] VLC installed." -Foregroundcolor Green
-        Write-Host "[*] Installing 7zip..." -Foregroundcolor Yellow
-        $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
-            Select-Object -ExpandProperty Links | 
-            Where-Object {($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
-            Select-Object -ExpandProperty href)
-        Invoke-WebRequest $webLocation -OutFile $TemporaryDownloadFile
-        Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
-        Write-Host "[*] 7zip Installed." -Foregroundcolor Green
-    
+        foreach ($a in $applist) {
+            if ($a -eq "7zip") {
+               Write-Host "[*] Installing $a ..." -Foregroundcolor Yellow
+               $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
+                   Select-Object -ExpandProperty Links | 
+                   Where-Object {($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
+                   Select-Object -ExpandProperty href)
+               Invoke-WebRequest $webLocation -OutFile $TemporaryDownloadFile
+               Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
+               Write-Host "[*] $a Installed." -Foregroundcolor Green
+            }
+            else {
+                Write-Host "[*] Installing $a ..." -Foregroundcolor Yellow
+                winget install -e --id $a --silent --accept-source-agreements --accept-package-agreements
+                Write-Host "[*] $a Installed." -Foregroundcolor Green
+            }
+        }
     }
     end {
     
