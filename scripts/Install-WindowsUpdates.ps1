@@ -10,6 +10,7 @@ function Install-WindowsUpdates {
     param ()
     
     begin {
+        Install-Module PSWindowsUpdate
         Import-Module PSWindowsUpdate
     }
     
