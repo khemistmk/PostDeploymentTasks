@@ -8,7 +8,7 @@ Function Install-StandardApps {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\"
+        [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\",
         
         [Parameter()]
         [string[]]$applist = "Google.Chrome", "Mozilla.Firefox", "VideoLAN.VLC", "7zip"
