@@ -11,7 +11,7 @@ Function Install-StandardApps {
         [string]$TemporaryDownloadFolder = "C:\Users\" + $($env:username) + "\AppData\Local\Temp\",
         
         [Parameter()]
-        [string[]]$applist = "Google.Chrome", "Mozilla.Firefox", "VideoLAN.VLC", "7zip"
+        [string[]]$applist = "Google.Chrome","Mozilla.Firefox","VideoLAN.VLC","7zip"
     )
 
     begin {
