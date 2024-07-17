@@ -30,7 +30,7 @@ function Set-DefaultApps {
             $config = "$Browser$Mail$PDF.xml"
             try {
                 Write-Host "[*] Setting Default Apps..." -ForegroundColor Yellow 
-                DISM /Online /DefaultAppAssociations:$path\$config
+                DISM /Online /Import-DefaultAppAssociations:$path\$config
                 Write-Host "[*] Default Apps set." -ForegroundColor Green
             }
             catch {
