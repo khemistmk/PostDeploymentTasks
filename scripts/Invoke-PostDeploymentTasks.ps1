@@ -68,6 +68,13 @@ function Invoke-PostDeploymentTasks {
     }
 
     end {
+         if ($Host.Name -eq "ConsoleHost") {
+            Clear-Host
+            Get-SystemStatus
+            Write-Host "Press any key to continue..."
+            $Host.UI.RawUI.FlushInputBuffer()
+            $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
+         }
        Uninstall-Module -Name PSWINDOWSUPDATE
        Restart-Computer
     }
