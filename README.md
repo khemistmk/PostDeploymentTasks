@@ -27,7 +27,7 @@ Install-OEMKey
 ```
 ## Set-ComputerName
 ```Powershell
-Install-OEMKey
+Set-ComputerName
 ```
 
 ## Disable-Administrator
@@ -42,22 +42,22 @@ Set-PowerOptions -montimeoutac 60 -montimeoutdc 30 -sbtimeoutac 0 -sbtimeoutdc 0
 
 ## Remove-DeploymentFiles
 ```Powershell
-Install-OEMKey
+Remove-DeploymentFiles
 ```
 
 ## Set-DotNet
 ```Powershell
-Install-OEMKey
+Set-Dotnet -dotnet3 Enabled -dotnet4 Enabled 
 ```
           
 ## Uninstall-Package
 ```Powershell
-Install-OEMKey
+Uninstall-Package -PackageName SmartDeploy
 ```
 
 ## Install-StandardApps
 ```Powershell
-Install-OEMKey
+Install-StandardApps
 ```
 
 ## Install-SystemUpdate
@@ -65,32 +65,32 @@ Install-OEMKey
 Install-OEMKey
 ```
 
-## Install-WindowsUpdates
+## Install-WinUpdate
 ```Powershell
-Install-OEMKey
+Install-WinUpdate
 ```
 
 ## Set-BitlockerDrive
 ```Powershell
-Install-OEMKey
+Set-BitlockerDrive
 ```
         
 ## Install-MSOffice
 ```Powershell
-Install-OEMKey
+Install-MSOffice
 ```
 
 ## Install-PDF
 ```Powershell
-Install-OEMKey
+Install-PDF
 ```
 
 ## Remove-Bloat
 ```Powershell
-Install-OEMKey
+Remove-Bloat
 ```
 
 ## Set-DefaultApps
 ```Powershell
-Install-OEMKey
+Set-DefaultApps
 ```
