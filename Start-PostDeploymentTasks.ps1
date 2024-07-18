@@ -1,6 +1,7 @@
 $params = @{
     InstallOfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
     InstallPDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
+}
 
 Set-ExecutionPolicy Bypass
 New-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp" -type Directory
