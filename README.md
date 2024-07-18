@@ -22,31 +22,75 @@ Import-Module .\PostDeploymentTasks.psm1
 ```
 
 ## Install-OEMKey
-
+```Powershell
+Install-OEMKey
+```
 ## Set-ComputerName
+```Powershell
+Install-OEMKey
+```
 
 ## Disable-Administrator
+```Powershell
+Disable-Administrator
+```
 
 ## Set-PowerOptions
+```Powershell
+Set-PowerOptions -montimeoutac 60 -montimeoutdc 30 -sbtimeoutac 0 -sbtimeoutdc 0 -faststartup Disabled -powerbutton Shutdown -sleepbutton Shutdown -closelid Nothing
+```
 
 ## Remove-DeploymentFiles
+```Powershell
+Install-OEMKey
+```
 
 ## Set-DotNet
+```Powershell
+Install-OEMKey
+```
           
 ## Uninstall-Package
+```Powershell
+Install-OEMKey
+```
 
 ## Install-StandardApps
+```Powershell
+Install-OEMKey
+```
 
 ## Install-SystemUpdate
+```Powershell
+Install-OEMKey
+```
 
 ## Install-WindowsUpdates
+```Powershell
+Install-OEMKey
+```
 
-## Set-BitlockerDrive C:
+## Set-BitlockerDrive
+```Powershell
+Install-OEMKey
+```
         
 ## Install-MSOffice
+```Powershell
+Install-OEMKey
+```
 
 ## Install-PDF
+```Powershell
+Install-OEMKey
+```
 
 ## Remove-Bloat
+```Powershell
+Install-OEMKey
+```
 
 ## Set-DefaultApps
+```Powershell
+Install-OEMKey
+```
