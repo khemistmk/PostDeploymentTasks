@@ -18,14 +18,22 @@ function Get-SystemStatus {
         $computername = (Get-WmiObject -Class Win32_Operatingsystem).PSComputerName
         $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe*") -or ($_.Name -like "*Foxit*")}).Name
         $MSOfficeVoucher = Read-Host "Enter Microsoft Office Voucher:"
-        $MSOfficeActivationEmail = $serialnumber + "@tuscom.us"
+        $MSOfficeActivationEmail = Read-Host "Enter Microsoft Office Activation Email"
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
         $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*")}).Name
+        $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
+        $model = (Get-CimInstance -ClassName Win32_ComputerSystem).model
         $CPUInfo = (Get-CimInstance Win32_Processor).name
         $RAM = Get-CimInstance win32_ComputerSystem | foreach {[math]::round($_.TotalPhysicalMemory /1GB)}
     }
+        $Drivesize = Get-CimInstance -ClassName win32_logicaldisk | Where-Object {$_.Drivetype -eq "3"} | foreach {[math]::round($_.size /1GB)}
 
     process {
+        switch ($drivesize) {
+            '465' { $Drive = "500 GB"}
+            '931' { $Drive = "1 TB"}
+            '1810' { $Drive = "2 TB"}
+        }
         $Programs = @()
         $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos"
         foreach ($p in $Programlist) {
