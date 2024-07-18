@@ -19,16 +19,13 @@ function Get-SystemStatus {
         $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe*") -or ($_.Name -like "*Foxit*")}).Name
         $MSOfficeVoucher = Read-Host "Enter Microsoft Office Voucher:"
         $MSOfficeActivationEmail = $serialnumber + "@tuscom.us"
-        $adminaccount = Get-LocalUser -Name "Administrator"
+        $Admin = (Get-LocalUser -Name "Administrator").Enabled
         $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*")}).Name
         $CPUInfo = (Get-CimInstance Win32_Processor).name
         $RAM = Get-CimInstance win32_ComputerSystem | foreach {[math]::round($_.TotalPhysicalMemory /1GB)}
     }
 
     process {
-        if ($adminaccount.Enabled -eq "False") { $Admin = "Administrator Disabled"}
-
-
         $Programs = @()
         $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos"
         foreach ($p in $Programlist) {
