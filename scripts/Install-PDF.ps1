@@ -9,7 +9,7 @@ Function Install-PDF {
     [CmdletBinding()]
     param (
         [Parameter()]
-        #[Validateset("Adobe2020","AdobeReader","FoxitBusiness")]
+        # [Validateset("Adobe2020","AdobeReader","FoxitBusiness")]
         [string]$InstallPDFVers,
         
         [Parameter()]
