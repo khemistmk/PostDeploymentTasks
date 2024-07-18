@@ -6,7 +6,7 @@ $params = @{
 Set-ExecutionPolicy Bypass
 New-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp" -type Directory | Out-Null
 $Moduledir = "$env:Userprofile\Documents\WindowsPowershell\Modules"
-if(!(TestPath $Moduledir)) {
+if(!(Test-Path $Moduledir)) {
     New-Item -Path "$env:Userprofile\Documents\WindowsPowershell\Modules" -type Directory -Force | Out-Null
 }
 Invoke-WebRequest -Uri "https://github.com/khemistmk/PostDeploymentTasks/archive/refs/heads/main.zip" -OutFile "$env:Userprofile\Documents\WindowsPowershell\temp\PostDeploymentTasks.zip"
