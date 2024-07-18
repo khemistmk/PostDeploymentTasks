@@ -25,9 +25,8 @@ function Get-SystemStatus {
         $model = (Get-CimInstance -ClassName Win32_ComputerSystem).model
         $CPUInfo = (Get-CimInstance Win32_Processor).name
         $RAM = Get-CimInstance win32_ComputerSystem | foreach {[math]::round($_.TotalPhysicalMemory /1GB)}
-    }
         $Drivesize = Get-CimInstance -ClassName win32_logicaldisk | Where-Object {$_.Drivetype -eq "3"} | foreach {[math]::round($_.size /1GB)}
-
+    }
     process {
         switch ($drivesize) {
             '465' { $Drive = "500 GB"}
