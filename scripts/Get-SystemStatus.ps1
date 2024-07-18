@@ -28,9 +28,11 @@ function Get-SystemStatus {
         $Drivesize = Get-CimInstance -ClassName win32_logicaldisk | Where-Object {$_.Drivetype -eq "3"} | foreach {[math]::round($_.size /1GB)}
     }
     process {
-        switch ($drivesize) {
-            '465' { $Drive = "500 GB"}
-            '931' { $Drive = "1 TB"}
+        if (($drivesize -gt "459")-and ($Drivesize -lt "468")) { $Drive = "500 GB"}
+        if (($drivesize -gt "469") -and ($Drivesize -lt "479")) { $Drive = "512 GB"}
+        if (($drivesize -gt "929") -and ($Drivesize -lt "935")) { $Drive = "1 TB"}
+        if (($drivesize -gt "1800") -and ($Drivesize -lt "1900")) { $Drive = "2 TB"}
+            
             '1810' { $Drive = "2 TB"}
         }
         $Programs = @()
