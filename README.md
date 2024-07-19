@@ -26,6 +26,7 @@ Import-Module .\PostDeploymentTasks.psm1
 
 ```Powershell
 Invoke-PostDeploymentTasks -InstallOfficeVers OHBE21 -InstallPDFVers AdobeReader
+```
 
 ## Disable-Administrator
 ```Powershell
