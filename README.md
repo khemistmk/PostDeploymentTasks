@@ -5,8 +5,8 @@ This powershell module contains cmdlets to assist in rapid deployment of user ma
 ## Table of Contents
 
 - [PostDeploymentTasks](#PostDeploymentTasks)
-- [Release Notes](#Release Notes)
-- [Usage and Examples](#Usage and Examples)
+- [Release Notes](#Release-Notes)
+- [Usage and Examples](#Usage-and-Examples)
   - [Invoke-PostDeploymentTasks](#Invoke-PostDeploymentTasks)
   - [Disable-Administrator](##Disable-Administrator)
   - [Get-SystemStatus](#Get-SystemStatus)
