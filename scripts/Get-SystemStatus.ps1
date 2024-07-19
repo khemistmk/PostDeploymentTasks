@@ -41,8 +41,9 @@ function Get-SystemStatus {
         $plist = $Programs | Out-String
         $Report = @"
 
+Deployment Date:            $date
 Customer Name:              $CustomerName ($Username)
-SN:                         $SerialNumber
+Serial Number:              $SerialNumber
 Computer Name:              $computername
 
 **************************************************************
