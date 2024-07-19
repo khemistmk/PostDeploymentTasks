@@ -21,43 +21,39 @@ v0.0.1 Alpha
 Import-Module .\PostDeploymentTasks.psm1
 ```
 
-## Install-OEMKey
+## Invoke-PostDeploymentTasks
+- Invokes several submodules to automate the post-deployment process.
 ```Powershell
-Install-OEMKey
-```
-## Set-ComputerName
-```Powershell
-Set-ComputerName
-```
+Invoke-PostDeploymentTasks -InstallOfficeVers OHBE21 -InstallPDFVers AdobeReader
 
 ## Disable-Administrator
 ```Powershell
 Disable-Administrator
 ```
 
-## Set-PowerOptions
+## Get-SystemStatus
 ```Powershell
-Set-PowerOptions -montimeoutac 60 -montimeoutdc 30 -sbtimeoutac 0 -sbtimeoutdc 0 -faststartup Disabled -powerbutton Shutdown -sleepbutton Shutdown -closelid Nothing
+Get-SystemStatus
 ```
 
-## Remove-DeploymentFiles
+## Install-MSOffice
 ```Powershell
-Remove-DeploymentFiles
+Install-MSOffice -officevers O365
 ```
 
-## Set-DotNet
+## Install-OEMKey
 ```Powershell
-Set-Dotnet -dotnet3 Enabled -dotnet4 Enabled 
+Install-OEMKey
 ```
-          
-## Uninstall-Package
+
+## Install-PDF
 ```Powershell
-Uninstall-Package -PackageName SmartDeploy
+Install-PDF -PDFVersion Adobe2020
 ```
 
 ## Install-StandardApps
 ```Powershell
-Install-StandardApps
+Install-StandardApps -Tempfolder "C:\temp" -applist "Google.Chrome", "Mozilla.Firefox"
 ```
 
 ## Install-SystemUpdate
@@ -70,27 +66,37 @@ Install-OEMKey
 Install-WinUpdate
 ```
 
-## Set-BitlockerDrive
-```Powershell
-Set-BitlockerDrive
-```
-        
-## Install-MSOffice
-```Powershell
-Install-MSOffice
-```
-
-## Install-PDF
-```Powershell
-Install-PDF
-```
-
 ## Remove-Bloat
 ```Powershell
 Remove-Bloat
 ```
 
+## Remove-DeploymentFiles
+```Powershell
+Remove-DeploymentFiles
+```
+
+## Set-BitlockerDrive
+```Powershell
+Set-BitlockerDrive -SaveLocation "$env:Userprofile\Documents" -Filename $env:computername
+```
+
 ## Set-DefaultApps
 ```Powershell
-Set-DefaultApps
+Set-DefaultApps -OEM "C:\OEM" -Platform "C:\Platform"
+```
+
+## Set-DotNet
+```Powershell
+Set-Dotnet -dotnet3 Enabled -dotnet4 Enabled 
+```
+
+## Set-PowerOptions
+```Powershell
+Set-PowerOptions -montimeoutac 60 -montimeoutdc 30 -sbtimeoutac 0 -sbtimeoutdc 0 -faststartup Disabled -powerbutton Shutdown -sleepbutton Shutdown -closelid Nothing
+```
+
+## Uninstall-Package
+```Powershell
+Uninstall-Package -PackageName SmartDeploy
 ```
