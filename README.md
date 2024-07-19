@@ -7,8 +7,7 @@ This powershell module contains cmdlets to assist in rapid deployment of user ma
 - [Release Notes](#Release Notes)
 - [Usage and Examples](#Usage and Examples)
   - [Invoke-PostDeploymentTasks](##Invoke-PostDeploymentTasks)
-  - [Disable-Administrator](#
-Disable-Administrator)
+  - [Disable-Administrator](##Disable-Administrator)
   - [Get-SystemStatus](##Get-SystemStatus)
   - [Install-MSOffice](##Install-MSOffice)
   - [Install-OEMKey](##Install-OEMKey)
