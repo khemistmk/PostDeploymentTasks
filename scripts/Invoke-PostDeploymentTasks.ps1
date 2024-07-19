@@ -70,7 +70,8 @@ function Invoke-PostDeploymentTasks {
             $Host.UI.RawUI.FlushInputBuffer()
             $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
          }
-       $WshShell = New-Object -comObject WScript. Shell.$WshShell.RegWrite('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\InstallAtShutdown', '1', 'REG_DWORD')
+       $WshShell = New-Object -comObject WScript. Shell
+     $WshShell.RegWrite('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\InstallAtShutdown', '1', 'REG_DWORD')
 
        Restart-Computer
     }
