@@ -10,14 +10,14 @@ function Install-WindowsUpdates {
     param ()
     
     begin {
-        Install-Module -Name PSWindowsUpdate
-        Import-Module PSWindowsUpdate
+        
     }
     
     process {
         try {
             Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
-            Install-WindowsUpdate -AcceptAll -IgnoreReboot
+            usoclient ScanInstallWait
+            usoclient StartInstall
             Write-Host "[*] Windows Updates Completed" -ForegroundColor Green
         }
         catch {
@@ -25,6 +25,6 @@ function Install-WindowsUpdates {
         }
     }
     end {
-        Uninstall-Module PSWindowsUpdate
+
     }
 }
