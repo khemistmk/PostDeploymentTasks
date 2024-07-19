@@ -4,6 +4,26 @@ This powershell module contains cmdlets to assist in rapid deployment of user ma
 
 ## Table of Contents
 - [PostDeploymentTasks](#PostDeploymentTasks)
+- [Release Notes](#Release Notes)
+- [Usage and Examples](#Usage and Examples)
+-- [Invoke-PostDeploymentTasks](##Invoke-PostDeploymentTasks)
+-- [Disable-Administrator](#
+Disable-Administrator)
+-- [Get-SystemStatus](##Get-SystemStatus)
+-- [Install-MSOffice](##Install-MSOffice)
+-- [Install-OEMKey](##Install-OEMKey)
+-- [Install-PDF](##Install-PDF)
+-- [Install-StandardApps](##Install-StandardApps)
+-- [Install-SystemUpdate](##Install-SystemUpdate)
+-- [Install-WinUpdate](##Install-WinUpdate)
+-- [Remove-Bloat](##Remove-Bloat)
+-- [Remove-DeploymentFiles](##Remove-DeploymentFiles)
+-- [Set-BitlockerDrive](##Set-BitlockerDrive)
+-- [Set-BitlockerDrive](##Set-BitlockerDrive)
+-- [Set-DefaultApps](##Set-DefaultApps)
+-- [Set-DotNet](##Set-DotNet)
+-- [Set-PowerOptions](##Set-PowerOptions)
+-- [Uninstall-Package](##Uninstall-Package)
 
 
 
