@@ -52,18 +52,26 @@ $MSOfficevers               $MSOfficeVoucher
 $MSOfficeActivationEmail
 **************************************************************
 
-Computer Information
+Hardware Information
 ______________________________________________________________
 Manufacturer:               $manufacturer
 Model:                      $model
 CPU:                        $CPUInfo
 RAM:                        $RAM GB
 Drive:                      $Drive GB $Drivemanufacturer
-
+Graphics:                   $graphics
+______________________________________________________________
+Deployment Tasks
+______________________________________________________________
+OEM Info:                   $OEM
+Deployment Folders:         $folders
+Windows Activation:         $activation
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
 Power Options set:          $power
 
+
+______________________________________________________________
 Installed Software
 _____________________________________________________________
 $plist
