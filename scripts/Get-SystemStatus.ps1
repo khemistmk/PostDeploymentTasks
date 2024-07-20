@@ -12,26 +12,43 @@ function Get-SystemStatus {
     )
 
     begin {   
+        $date = Get-Date
         $CustomerName = Read-Host -Prompt "Enter customer name:"
         $Username = Read-Host -Prompt "Enter username:"
         $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
         $computername = (Get-WmiObject -Class Win32_Operatingsystem).PSComputerName
+        $winver = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
+        $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
         $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe*") -or ($_.Name -like "*Foxit*")}).Name
         $MSOfficeVoucher = Read-Host "Enter Microsoft Office Voucher:"
         $MSOfficeActivationEmail = Read-Host "Enter Microsoft Office Activation Email"
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
-        $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*")}).Name
+        $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name
         $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
         $model = (Get-CimInstance -ClassName Win32_ComputerSystem).model
         $CPUInfo = (Get-CimInstance Win32_Processor).name
-        $RAM = Get-CimInstance win32_ComputerSystem | foreach {[math]::round($_.TotalPhysicalMemory /1GB)}
-        $Drivesize = Get-CimInstance -ClassName win32_logicaldisk | Where-Object {$_.Drivetype -eq "3"} | foreach {[math]::round($_.size /1GB)}
+        $RAM = Get-CimInstance win32_ComputerSystem | ForEach-Object {[math]::round($_.TotalPhysicalMemory /1GB)}
+        $drivesize = Get-PhysicalDisk | ForEach-Object {[math]::round($_.size /1GB)}
+        $Drivemanufacturer = Get-PhysicalDisk | Select-Object -ExpandProperty FriendlyName
+        $drivebrand,$driveserial = $Drivemanufacturer -split " "
+        $Drivetype = Get-PhysicalDisk | Select-Object -ExpandProperty MediaType
+        $Bustype = Get-PhysicalDisk | Select-Object -ExpandProperty Bustype
+        $graphics = (Get-CimInstance -ClassName Win32_VideoController).Description
+        $OEM =  Get-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\OEMInformation" | Select-Object -Property Manufacturer,SupportHours,SupportPhone,SupportURL
+        $oemman = $OEM.Manufacturer
+        $oemhours = $OEM.SupportHours
+        $oemphone = $OEM.SupportPhone
+        $oemurl = $OEM.SupportURL
+
     }
     process {
-        if (($drivesize -gt "459")-and ($Drivesize -lt "468")) { $Drive = "500 GB"}
-        if (($drivesize -gt "469") -and ($Drivesize -lt "479")) { $Drive = "512 GB"}
-        if (($drivesize -gt "929") -and ($Drivesize -lt "935")) { $Drive = "1 TB"}
-        if (($drivesize -gt "1800") -and ($Drivesize -lt "1900")) { $Drive = "2 TB"}
+        if ($licensestatus.LicenseStatus -eq 1){
+            $winactivation = "Activated"
+        }
+        if (($drivesize -gt "459")-and ($drivesize -lt "468")) { $Drive = "500 GB"}
+        if (($drivesize -gt "469") -and ($drivesize -lt "479")) { $Drive = "512 GB"}
+        if (($drivesize -gt "929") -and ($drivesize -lt "1024")) { $Drive = "1 TB"}
+        if (($drivesize -gt "1800") -and ($drivesize -lt "2048")) { $Drive = "2 TB"}
        
         $Programs = @()
         $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos"
@@ -48,6 +65,8 @@ Computer Name:              $computername
 
 **************************************************************
 Activation Information
+Windows Version:            $winver
+Windows Activation:         $winactivation
 $PDFVersion                 $PDFkey
 $MSOfficevers               $MSOfficeVoucher
 $MSOfficeActivationEmail
@@ -59,14 +78,17 @@ Manufacturer:               $manufacturer
 Model:                      $model
 CPU:                        $CPUInfo
 RAM:                        $RAM GB
-Drive:                      $Drive GB $Drivemanufacturer
+Drive:                      $Drive $drivebrand $Bustype $Drivetype                           
 Graphics:                   $graphics
-______________________________________________________________
+
 Deployment Tasks
 ______________________________________________________________
-OEM Info:                   $OEM
+OEM Info:                   Manufacturer: $oemman
+                            Support Hours: $oemhours
+                            Support Phone: $oemphone
+                            Support URL: $oemurl 
 Deployment Folders:         $folders
-Windows Activation:         $activation
+
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
 Power Options set:          $power
