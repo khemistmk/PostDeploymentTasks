@@ -13,11 +13,11 @@ function Set-DotNet {
     param (
         [Parameter()]
         [ValidateSet("Enabled", "Disabled")]
-        [string]$setdotnet3,
+        [string]$setdotnet3 = "Enabled",
         
         [Parameter()]
         [ValidateSet("Enabled", "Disabled")]
-        [string]$setdotnet4
+        [string]$setdotnet4 = "Enabled"
     )
     begin {
     }

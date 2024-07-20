@@ -172,7 +172,7 @@ function Set-PowerOptions {
             Write-Error $_
             Write-Host "Failed to set Sleep Button setting"
         }
-        $clPath = "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\96996BC0-AD50-47EC-923B-6F41874DD9EB"
+        $clPath = "HKLM:\SOFTWARE\Policies\Microsoft\Power\PowerSettings\5ca83367-6e45-459f-a27b-476b1d01c936"
         $clNameAC = "ACSettingIndex"
         $clNameDC = "DCSettingIndex"
 
