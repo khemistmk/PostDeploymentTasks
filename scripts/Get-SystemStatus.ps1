@@ -56,6 +56,13 @@ function Get-SystemStatus {
             $Programs += (Get-Package | Where-Object {$_.Name -like "*$p*"}).Name
         }
         $plist = $Programs | Out-String
+
+                if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
+            $bit = "Enabled"
+        }
+         else {
+            $bit = "Disabled"
+        }
         $Report = @"
 
 Deployment Date:            $date
@@ -87,6 +94,7 @@ OEM Info:                   Manufacturer: $oemman
                             Support Hours: $oemhours
                             Support Phone: $oemphone
                             Support URL: $oemurl 
+Bitlocker:                  $bit
 Deployment Folders:         $folders
 
 Administrator:              $Admin
