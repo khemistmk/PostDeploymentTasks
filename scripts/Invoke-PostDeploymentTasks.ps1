@@ -12,7 +12,10 @@ function Invoke-PostDeploymentTasks {
         [string]$InstallOfficeVers,
         
         [Parameter()] 
-        [string]$InstallPDFVers
+        [string]$InstallPDFVers,
+    
+        [Parameter()]
+        [string]$SaveLocation
     )
 
     begin {
@@ -48,7 +51,7 @@ function Invoke-PostDeploymentTasks {
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
-            Set-BitlockerDrive C:
+            Set-BitlockerDrive -SystemDrive C: -SaveLocation $SaveLocation
         }
         Invoke-Defaultdeploy
         if ($InstallOfficevers) {
@@ -65,7 +68,7 @@ function Invoke-PostDeploymentTasks {
     end {
          if ($Host.Name -eq "ConsoleHost") {
             Clear-Host
-            Get-SystemStatus
+            Get-SystemStatus -SaveLocation $SaveLocation
             Write-Host "Press any key to continue..."
             $Host.UI.RawUI.FlushInputBuffer()
             $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
