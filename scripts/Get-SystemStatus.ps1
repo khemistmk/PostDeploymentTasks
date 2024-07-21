@@ -9,21 +9,21 @@ function Get-SystemStatus {
     [CmdletBinding()]
     param (
         [Parameter(mandatory = $true)]
-        $customername,
+        [string]$customername,
       
         [Parameter(mandatory = $true)]
-        $Username,
+        [string]$Username,
 
         [Parameter(mandatory = $true)]
-        $MSOfficeActivationEmail,
+        [string]$MSOfficeActivationEmail,
 
         [Parameter()]
         [string]$SaveLocation = "$env:Userprofile\Documents"
         [Parameter()]
-        $MSOfficeVoucher,
+        [string]$MSOfficeVoucher,
         
         [Parameter()]
-        $PDFkey
+        [string]$PDFkey
         
     )
 
