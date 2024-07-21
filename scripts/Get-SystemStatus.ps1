@@ -8,20 +8,30 @@ function Get-SystemStatus {
 #>
     [CmdletBinding()]
     param (
+        [Parameter(mandatory = $true)]
+        $customername,
+      
+        [Parameter(mandatory = $true)]
+        $Username,
 
+        [Parameter(mandatory = $true)]
+        $MSOfficeActivationEmail,
+
+        [Parameter()]
+        $MSOfficeVoucher,
+        
+        [Parameter()]
+        $PDFkey
+        
     )
 
     begin {   
         $date = Get-Date
-        $CustomerName = Read-Host -Prompt "Enter customer name:"
-        $Username = Read-Host -Prompt "Enter username:"
         $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
         $computername = (Get-WmiObject -Class Win32_Operatingsystem).PSComputerName
         $winver = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
         $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
-        $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe*") -or ($_.Name -like "*Foxit*")}).Name
-        $MSOfficeVoucher = Read-Host "Enter Microsoft Office Voucher:"
-        $MSOfficeActivationEmail = Read-Host "Enter Microsoft Office Activation Email"
+        $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe Acrobat*") -or ($_.Name -like "*Foxit*")}).Name
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
         $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name
         $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
