@@ -126,7 +126,6 @@ function Get-SystemStatus {
         if ($val -eq 0) {
             $val = 'Never'
         }
-
         $out[$key] = $val
     }
     end {
@@ -173,7 +172,9 @@ OEM folder:                 $OEMfolder
 
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
-Power Options set:          Monitor Timeout Battery 
+Power Options:              Monitor Timeout Battery: $mondc
+                            Monitor Timeout Plugged in: $monac
+                            
 Fast Startup:               $faststart
 SmartDeploy:                $SmartDeploy
 
