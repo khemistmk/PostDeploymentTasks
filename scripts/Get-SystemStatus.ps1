@@ -18,6 +18,8 @@ function Get-SystemStatus {
         $MSOfficeActivationEmail,
 
         [Parameter()]
+        [string]$SaveLocation = "$env:Userprofile\Documents"
+        [Parameter()]
         $MSOfficeVoucher,
         
         [Parameter()]
@@ -128,7 +130,7 @@ $plist
 "@
 
 Clear-Host
-$Report > $env:USERPROFILE\Documents\$Computername.txt
+$Report > $SaveLocation\$Computername.txt
 Write-Host "$Report"
 
     }
