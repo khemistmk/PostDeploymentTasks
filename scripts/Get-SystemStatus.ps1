@@ -176,8 +176,8 @@ Fast Startup:               $faststart
 SmartDeploy:                $SmartDeploy
 
 Power Options:  
-    Monitor Timeout Battery:    $montimeoutdc   Minutes
-    Monitor Timeout Plugged in: $montimeoutac   Minutes
+    Monitor Timeout Battery:    $montimeoutdc Minutes
+    Monitor Timeout Plugged in: $montimeoutac Minutes
     Sleep Timeout Battery:      $sleeptimeoutdc Minutes
     Sleep Timeout Plugged in:   $sleeptimeoutac Minutes 
 
