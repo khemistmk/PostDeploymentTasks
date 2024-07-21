@@ -74,7 +74,12 @@ function Get-SystemStatus {
             $Programs += (Get-Package | Where-Object {$_.Name -like "*$p*"}).Name
         }
         $plist = $Programs | Out-String
-
+        if ($Admin -eq "False") {
+            $Adminstatus = "Disabled"
+        }
+        else {
+            $Adminstatus = "Enabled"
+        }
         if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
             $bit = "Enabled"
         }
@@ -112,27 +117,23 @@ function Get-SystemStatus {
             $SmartDeploy = "Not Removed"
         }
         
-        powercfg @(
-    '/query'
-    '381b4222-f694-41f0-9685-ff5bb260df2e'
-    '7516b95f-f776-4464-8c53-06167f40cc99'
-    '3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e'
-) | Select-Object -Last 2 -Skip 1 | & {
-    begin { $global:out = [ordered]@{} }
-    process {
-        $key, $val = $_.Split(':').Trim()
-        $val = [int] $val / 60
-
-        if ($val -eq 0) {
-            $val = 'Never'
-        }
-        $out[$key] = $val
-    }
-    end {
-        $out
-    }
-}
-$monac,$mondc = $out.values -split ";"
+        $montimeoutac,$montimeoutdc = powercfg @(
+            '/query'
+            'scheme_current'
+            '7516b95f-f776-4464-8c53-06167f40cc99'
+            '3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e'
+        ) |
+        Select-Object -Last 2 -Skip 1 |
+        Foreach-Object {($_.Split(':')[1]) /60}
+        
+        $sleeptimeoutac,$sleeptimeoutdc = powercfg @(
+            '/query'
+            'scheme_current'
+            '238c9fa8-0aad-41ed-83f4-97be242c8f20'
+            '29f6c1db-86da-48c5-9fdb-f2b67b1f44da'
+        ) |
+        Select-Object -Last 2 -Skip 1 |
+        Foreach-Object {($_.Split(':')[1]) /60}
 
         $Report = @"
 
@@ -148,10 +149,9 @@ Windows Activation:         $winactivation
 $PDFVersion                 $PDFkey
 $MSOfficevers               $MSOfficeVoucher
 $MSOfficeActivationEmail
-**************************************************************
 
 Hardware Information
-______________________________________________________________
+**************************************************************
 Manufacturer:               $manufacturer
 Model:                      $model
 CPU:                        $CPUInfo
@@ -160,26 +160,27 @@ Drive:                      $Drive $drivebrand $Bustype $Drivetype
 Graphics:                   $graphics
 
 Deployment Tasks
-______________________________________________________________
-OEM Info:                   Manufacturer: $oemman
-                            Support Hours: $oemhours
-                            Support Phone: $oemphone
-                            Support URL: $oemurl 
+**************************************************************
+OEM Info:   
+            Manufacturer:   $oemman
+            Support Hours:  $oemhours
+            Support Phone:  $oemphone
+            Support URL:    $oemurl 
 
 Bitlocker:                  $bit
 Platform folder:            $platform
 OEM folder:                 $OEMfolder
-
-Administrator:              $Admin
+Administrator:              $Adminstatus
 Dotnet 3.5:                 $dotnet
-Power Options:              Monitor Timeout Battery: $mondc
-                            Monitor Timeout Plugged in: $monac
-                            
 Fast Startup:               $faststart
 SmartDeploy:                $SmartDeploy
 
+Power Options:  
+    Monitor Timeout Battery:    $montimeoutdc   Minutes
+    Monitor Timeout Plugged in: $montimeoutac   Minutes
+    Sleep Timeout Battery:      $sleeptimeoutdc Minutes
+    Sleep Timeout Plugged in:   $sleeptimeoutac Minutes 
 
-______________________________________________________________
 Installed Software
 _____________________________________________________________
 $plist
