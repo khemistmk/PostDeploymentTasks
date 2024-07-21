@@ -1,6 +1,7 @@
 $params = @{
     InstallOfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
     InstallPDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
+    SaveLocation = "$env:Userprofile\Documents"
 }
 
 Set-ExecutionPolicy Bypass
