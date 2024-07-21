@@ -51,7 +51,7 @@ function Invoke-PostDeploymentTasks {
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
-            Set-BitlockerDrive -SystemDrive C: -SaveLocation $SaveLocation
+            Set-BitlockerDrive -SaveLocation $SaveLocation
         }
         Invoke-Defaultdeploy
         if ($InstallOfficevers) {
