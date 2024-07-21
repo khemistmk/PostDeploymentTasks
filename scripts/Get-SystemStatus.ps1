@@ -73,6 +73,11 @@ function Get-SystemStatus {
          else {
             $bit = "Disabled"
         }
+
+        if (!(Test-Path "C:\Platform")) { $platform = "Removed" }
+        if (!(Test-Path "C:\OEM")) { $oemfolder = "Removed" }
+        if ((Get-Package | Where-Object {$_.Name -like "*SmartDeploy*"}) -eq $null) { $SmartDeploy = "Removed" }
+
         $Report = @"
 
 Deployment Date:            $date
@@ -104,12 +109,16 @@ OEM Info:                   Manufacturer: $oemman
                             Support Hours: $oemhours
                             Support Phone: $oemphone
                             Support URL: $oemurl 
+
 Bitlocker:                  $bit
-Deployment Folders:         $folders
+Platform folder:            $platform
+OEM folder:                 $OEMfolder
 
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
 Power Options set:          $power
+Fast Startup:               $faststart
+SmartDeploy:                $SmartDeploy
 
 
 ______________________________________________________________
