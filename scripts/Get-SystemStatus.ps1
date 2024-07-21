@@ -18,7 +18,7 @@ function Get-SystemStatus {
         [string]$MSOfficeActivationEmail,
 
         [Parameter()]
-        [string]$SaveLocation = "$env:Userprofile\Documents"
+        [string]$SaveLocation = "$env:Userprofile\Documents",
 
         [Parameter()]
         [string]$MSOfficeVoucher,
@@ -36,7 +36,7 @@ function Get-SystemStatus {
         $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
         $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe Acrobat*") -or ($_.Name -like "*Foxit*")}).Name
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
-        $MSOfficevers = (Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name
+        $MSOfficevers = @((Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name)
         $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
         $model = (Get-CimInstance -ClassName Win32_ComputerSystem).model
         $CPUInfo = (Get-CimInstance Win32_Processor).name
@@ -52,6 +52,11 @@ function Get-SystemStatus {
         $oemhours = $OEM.SupportHours
         $oemphone = $OEM.SupportPhone
         $oemurl = $OEM.SupportURL
+        $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
+        $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
+        $fsName = "HiberbootEnabled"
+        $fsvalue = (Get-ItemProperty -Path $fsPath -Name $fsName).HiberbootEnabled
+
 
     }
     process {
@@ -70,16 +75,65 @@ function Get-SystemStatus {
         }
         $plist = $Programs | Out-String
 
-                if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
+        if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
             $bit = "Enabled"
         }
-         else {
+        else {
             $bit = "Disabled"
         }
+        if (!(Test-Path "C:\Platform")) {
+            $platform = "Removed"
+        }
+        else {
+            $platform = "Not Removed"
+        }
+        if (!(Test-Path "C:\OEM")) { 
+            $oemfolder = "Removed"
+        }
+        else {
+            $oemfolder = "Not Removed"
+        }
+        if ($dotnet3 -eq 'True') {
+            $dotnet = "Enabled"
+        }
+        else {
+            $dotnet = "Disabled"
+        }
+        if ($fsvalue -eq "0") {
+            $faststart = "Disabled"
+        }
+        else {
+            $faststart = "Enabled"
+        }
+        if ($null -eq (Get-Package | Where-Object {$_.Name -like "*SmartDeploy*"})) {
+            $SmartDeploy = "Removed"
+        }
+        else {
+            $SmartDeploy = "Not Removed"
+        }
+        
+        powercfg @(
+    '/query'
+    '381b4222-f694-41f0-9685-ff5bb260df2e'
+    '7516b95f-f776-4464-8c53-06167f40cc99'
+    '3c0bc021-c8a8-4e07-a973-6b14cbcb2b7e'
+) | Select-Object -Last 2 -Skip 1 | & {
+    begin { $global:out = [ordered]@{} }
+    process {
+        $key, $val = $_.Split(':').Trim()
+        $val = [int] $val / 60
 
-        if (!(Test-Path "C:\Platform")) { $platform = "Removed" }
-        if (!(Test-Path "C:\OEM")) { $oemfolder = "Removed" }
-        if ((Get-Package | Where-Object {$_.Name -like "*SmartDeploy*"}) -eq $null) { $SmartDeploy = "Removed" }
+        if ($val -eq 0) {
+            $val = 'Never'
+        }
+
+        $out[$key] = $val
+    }
+    end {
+        $out
+    }
+}
+$monac,$mondc = $out.values -split ";"
 
         $Report = @"
 
@@ -119,7 +173,7 @@ OEM folder:                 $OEMfolder
 
 Administrator:              $Admin
 Dotnet 3.5:                 $dotnet
-Power Options set:          $power
+Power Options set:          Monitor Timeout Battery 
 Fast Startup:               $faststart
 SmartDeploy:                $SmartDeploy
 

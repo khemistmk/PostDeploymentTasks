@@ -39,6 +39,7 @@ function Set-BitlockerDrive {
         Where-Object -Property KeyProtectorType -eq RecoveryPassword |
         Select-Object -Property KeyProtectorID,RecoveryPassword 
         $blid = $bitlockerkey.KeyProtectorID
+        $blid2 = $blid -split "{" -split "}"
         $blpw = $bitlockerkey.RecoveryPassword
         $bitlockerfile = 
 @"
@@ -49,7 +50,7 @@ function Set-BitlockerDrive {
 
         Identifier:
 
-	        $blid
+	        $blid2
 
         If the above identifier matches the one displayed by your PC, then use the following key to
         unlock your drive.
