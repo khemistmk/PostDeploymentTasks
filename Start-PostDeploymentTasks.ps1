@@ -1,10 +1,9 @@
-$params = @{
-    InstallOfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
-    InstallPDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
-    SaveLocation = "$env:Userprofile\Documents"
-}
-
 Set-ExecutionPolicy Bypass
+
+$InstallOfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
+$InstallPDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
+$SaveLocation = "$env:Userprofile\Documents"
+
 New-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp" -type Directory | Out-Null
 $Moduledir = "$env:Userprofile\Documents\WindowsPowershell\Modules"
 if(!(Test-Path $Moduledir)) {
@@ -15,4 +14,4 @@ Expand-Archive -Path "$env:Userprofile\Documents\WindowsPowershell\temp\PostDepl
 Move-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp\PostDeploymentTasks*" -Destination "$env:Userprofile\Documents\WindowsPowershell\Modules\PostDeploymentTasks"
 Remove-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp\" -Recurse
 Import-Module PostDeploymentTasks
-Invoke-PostDeploymentTasks $params
+Invoke-PostDeploymentTasks -InstallOfficeVers $officevers -InstallPDFVers $PDFVersion -SaveLocation $SaveLocation
