@@ -1,7 +1,7 @@
 Set-ExecutionPolicy Bypass
 
-$InstallOfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
-$InstallPDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
+$OfficeVers = Read-Host "Select Office Version (O365 or OHBE21)"
+$PDFVers = Read-Host "Select PDF Version (AdobeReader, Adobe2020, or FoxitBusiness)"
 $SaveLocation = "$env:Userprofile\Documents"
 
 New-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp" -type Directory | Out-Null
