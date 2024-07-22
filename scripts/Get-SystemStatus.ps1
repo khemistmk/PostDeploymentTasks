@@ -38,7 +38,7 @@ function Get-SystemStatus {
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
         $MSOfficevers = @((Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name)
         $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
-        $model = (Get-CimInstance -ClassName Win32_ComputerSystem).model
+        $model = (Get-CimInstance -Namespace root\wmi -ClassName MS_SystemInformation).SystemVersion
         $CPUInfo = (Get-CimInstance Win32_Processor).name
         $RAM = Get-CimInstance win32_ComputerSystem | ForEach-Object {[math]::round($_.TotalPhysicalMemory /1GB)}
         $drivesize = Get-PhysicalDisk | ForEach-Object {[math]::round($_.size /1GB)}
@@ -56,8 +56,16 @@ function Get-SystemStatus {
         $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
         $fsName = "HiberbootEnabled"
         $fsvalue = (Get-ItemProperty -Path $fsPath -Name $fsName).HiberbootEnabled
-
-
+        $RAMDIMMs = @()
+        $RAMinfo = Get-CimInstance -Classname Win32_PhysicalMemory
+        $ramcap = $RAMinfo | ForEach-Object {[math]::round($_.Capacity /1GB)}
+        $ramman = $RAMinfo.Manufacturer
+        $ramloc = $RAMinfo.DeviceLocator
+        $ramspeed = $RAMinfo.Speed
+        $RAM1 = $ramcap[0],"GB",$ramman[0],$ramspeed[0],"GHz", $ramloc[0]
+        $RAM2 = $ramcap[1],"GB",$ramman[1],$ramspeed[1],"GHz", $ramloc[1]
+        $RAM3 = $ramcap[2],"GB",$ramman[2],$ramspeed[2],"GHz", $ramloc[2]
+        $RAM4 = $ramcap[3],"GB",$ramman[3],$ramspeed[3],"GHz", $ramloc[3]
     }
     process {
         if ($licensestatus.LicenseStatus -eq 1){
@@ -69,7 +77,7 @@ function Get-SystemStatus {
         if (($drivesize -gt "1800") -and ($drivesize -lt "2048")) { $Drive = "2 TB"}
        
         $Programs = @()
-        $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos"
+        $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos","7-Zip"
         foreach ($p in $Programlist) {
             $Programs += (Get-Package | Where-Object {$_.Name -like "*$p*"}).Name
         }
@@ -155,7 +163,12 @@ Hardware Information
 Manufacturer:               $manufacturer
 Model:                      $model
 CPU:                        $CPUInfo
-RAM:                        $RAM GB
+Ram Info:
+            Total RAM:      $RAM GB
+                            $RAM1
+                            $RAM2
+                            $RAM3
+                            $RAM4
 Drive:                      $Drive $drivebrand $Bustype $Drivetype                           
 Graphics:                   $graphics
 
@@ -187,7 +200,7 @@ $plist
 "@
 
 Clear-Host
-$Report > $SaveLocation\$Computername.txt
+$Report > "$SaveLocation\$Computername-SystemStatus.txt"
 Write-Host "$Report"
 
     }
