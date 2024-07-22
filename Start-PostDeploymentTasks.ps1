@@ -14,4 +14,4 @@ Expand-Archive -Path "$env:Userprofile\Documents\WindowsPowershell\temp\PostDepl
 Move-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp\PostDeploymentTasks*" -Destination "$env:Userprofile\Documents\WindowsPowershell\Modules\PostDeploymentTasks"
 Remove-Item -Path "$env:Userprofile\Documents\WindowsPowershell\temp\" -Recurse
 Import-Module PostDeploymentTasks
-Invoke-PostDeploymentTasks -InstallOfficeVers $officevers -InstallPDFVers $PDFVersion -SaveLocation $SaveLocation
+Invoke-PostDeploymentTasks -InstallOfficeVers "$officevers" -InstallPDFVers "$PDFVersion" -SaveLocation "$SaveLocation"
