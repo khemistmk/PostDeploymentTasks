@@ -56,17 +56,13 @@ function Get-SystemStatus {
         $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
         $fsName = "HiberbootEnabled"
         $fsvalue = (Get-ItemProperty -Path $fsPath -Name $fsName).HiberbootEnabled
-        $RAMDIMMs = @()
         $RAMinfo = Get-CimInstance -Classname Win32_PhysicalMemory
         $ramcap = $RAMinfo | ForEach-Object {[math]::round($_.Capacity /1GB)}
         $ramman = $RAMinfo.Manufacturer
         $ramloc = $RAMinfo.DeviceLocator
         $ramspeed = $RAMinfo.Speed
-        $RAM1 = $ramcap[0],"GB",$ramman[0],$ramspeed[0],"GHz", $ramloc[0]
-        $RAM2 = $ramcap[1],"GB",$ramman[1],$ramspeed[1],"GHz", $ramloc[1]
-        $RAM3 = $ramcap[2],"GB",$ramman[2],$ramspeed[2],"GHz", $ramloc[2]
-        $RAM4 = $ramcap[3],"GB",$ramman[3],$ramspeed[3],"GHz", $ramloc[3]
-    }
+        $ramchannel = $RAMinfo.InterleaveDataDepth
+            }
     process {
         if ($licensestatus.LicenseStatus -eq 1){
             $winactivation = "Activated"
@@ -124,7 +120,21 @@ function Get-SystemStatus {
         else {
             $SmartDeploy = "Not Removed"
         }
-        
+        $ramchan = @()
+        foreach ($r in $ramchannel){
+            if ($r -eq "2") {
+                $ramchan += "Dual Channel"
+            }
+            else {
+                $_ = "Single Channel"
+            }
+        }
+
+        $RAM1 = $ramcap[0],"GB",$ramman[0],$ramspeed[0],"GHz", $ramchan[0],$ramloc[0]
+        $RAM2 = $ramcap[1],"GB",$ramman[1],$ramspeed[1],"GHz", $ramchan[0],$ramloc[1]
+        $RAM3 = $ramcap[2],"GB",$ramman[2],$ramspeed[2],"GHz", $ramchan[0],$ramloc[2]
+        $RAM4 = $ramcap[3],"GB",$ramman[3],$ramspeed[3],"GHz", $ramchan[0],$ramloc[3]
+
         $montimeoutac,$montimeoutdc = powercfg @(
             '/query'
             'scheme_current'

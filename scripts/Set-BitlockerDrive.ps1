@@ -66,7 +66,7 @@ function Set-BitlockerDrive {
 "@
     
         $bitlockerfile> "$SaveLocation\$Filename-bitlocker.txt"
-        Write-Host "Bitlocker enabled. Bitlocker key is saved to $SaveLocation\$Filename.txt" -ForegroundColor Green
+        Write-Host "Bitlocker enabled. Bitlocker key is saved to $SaveLocation\$Filename-bitlocker.txt" -ForegroundColor Green
         Write-Host "$Bitlockerkey" -ForegroundColor Yellow
     }
     end {
