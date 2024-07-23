@@ -75,11 +75,10 @@ function Invoke-PostDeploymentTasks {
             Get-SystemStatus -SaveLocation $SaveLocation
 
             $ts = $processTimer.Elapsed
-$elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $ts.Hours, $ts.Minutes, $ts.Seconds, ($ts.Milliseconds / 10)
+            $elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $ts.Hours, $ts.Minutes, $ts.Seconds, ($ts.Milliseconds / 10)
             Write-Host "[*] Deployment Completed in $elapsedtime." ForegroundColor Green 
             Write-Host "Deployment started at $deploystart"
             Write-Host "Deployment completed at $deployend"
-            Deployment to
             Write-Host "Press any key to continue..."
             $Host.UI.RawUI.FlushInputBuffer()
             $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
