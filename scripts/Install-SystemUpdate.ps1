@@ -31,14 +31,23 @@ Function Install-SystemUpdate {
                 $response = Invoke-WebRequest -Uri "https://support.lenovo.com/us/en/downloads/ds012808-lenovo-system-update-for-windows-10-7-32-bit-64-bit-desktop-notebook-workstation" -UseBasicParsing
                 $pattern = '(?<="Name":"Lenovo\ System\ Update")[\S\s]*,"Version":"(?<Version>[\d\.]+)'
                 $version = [regex]::Match($response.Content, $pattern).groups['Version'].value
-                $LSU = "https://download.lenovo.com/pccbbs/thinkvantage_en/system_update_$version.exe"
-                Invoke-WebRequest -Uri $LSU -OutFile "$PSScriptRoot\$systemupdate.exe"
+                $systemupdate = "system_update_$version.exe"
+                $LSU = "https://download.lenovo.com/pccbbs/thinkvantage_en/$systemupdate"
+                Invoke-WebRequest -Uri $LSU -OutFile "$setupfolder\$systemupdate"
             }
             catch {
                 Write-Error -Message "Unable to download System Update"
             }
             Write-Host "[*] Installing Lenovo System Update..." -ForegroundColor Yellow
-            Start-Process -FilePath "$PSScriptRoot\$systemupdate.exe" -ArgumentList "/VERYSILENT /NORESTART" -Wait
+            $process = Start-Process -FilePath "$setupfolder\$systemupdate" -ArgumentList "/VERYSILENT /NORESTART" -PassThru
+            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                Start-Sleep -Milliseconds 100
+                if ($process.HasExited) {
+                Write-Progress -Activity "Installer" -Completed
+                break
+                }
+            }
             $RegKey = "HKLM:\SOFTWARE\Policies\Lenovo\System Update\UserSettings\General"
             $RegName = "AdminCommandLine"
             $RegValue = "/CM -search A -action INSTALL -includerebootpackages 3 -noicon -noreboot -exporttowmi"    
@@ -51,7 +60,15 @@ Function Install-SystemUpdate {
                 New-ItemProperty -Path $RegKey -Name $RegName -Value $RegValue -Force | Out-Null
             } 
             Write-Host "[*] Running Lenovo System Update..." -ForegroundColor Yellow
-            Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM"
+            $process = Start-Process -FilePath "C:\Program Files (x86)\Lenovo\System Update\Tvsu.exe" -ArgumentList "/CM" -PassThru
+            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                Start-Sleep -Milliseconds 100
+                if ($process.HasExited) {
+                Write-Progress -Activity "Installer" -Completed
+                break
+                }
+            }
         }
         elseif ($manufacturer -contains "HP"){
             try {
@@ -59,15 +76,31 @@ Function Install-SystemUpdate {
                 $response = Invoke-WebRequest -Uri "http://ftp.ext.hp.com//pub/caps-softpaq/cmit/HPIA.html" -UseBasicParsing
                 $HPIAlink = $response | Select-Object -ExpandProperty Links | Where-Object {$_.href -like "*.exe"} | Select-Object -ExpandProperty href  
                 $HPIAroot,$HPIAfile = $HPIAlink -split "/hpia/"
-                Invoke-WebRequest -Uri $HPIAlink -OutFile "$PSScriptroot\$HPIAfile"
+                Invoke-WebRequest -Uri $HPIAlink -OutFile "$setupfolder\$HPIAfile"
             }
             catch {
                 Write-Error -Message "Unable to download HPIA"
             }
             Write-Host "[*] Running HPIA..." -ForegroundColor Yellow
-            Start-Process -Filepath "$PSScriptroot\$HPIAfile" -ArgumentList "/s"
+            $process = Start-Process -Filepath "$setupfolder\$HPIAfile" -ArgumentList "/s" -PassThru
+            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                Start-Sleep -Milliseconds 100
+                if ($process.HasExited) {
+                Write-Progress -Activity "Installer" -Completed
+                break
+                }
+            }
             $swpath = "C:\SWSetup\SP151464"
-            Start-Process -FilePath "$swpath\HPImageAssistant.exe" -ArgumentList "/Operation:Analyze", "/Category:All", "/selection:All", "/action:install", "/silent", "/reportFolder:c:\temp\HPIA\Report", "/softpaqdownloadfolder:c:\temp\HPIA\download"
+            Start-Process -FilePath "$swpath\HPImageAssistant.exe" -ArgumentList "/Operation:Analyze", "/Category:All", "/selection:All", "/action:install", "/silent", "/reportFolder:c:\temp\HPIA\Report", "/softpaqdownloadfolder:c:\temp\HPIA\download" -PassThru
+            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                Start-Sleep -Milliseconds 100
+                if ($process.HasExited) {
+                Write-Progress -Activity "Installer" -Completed
+                break
+                }
+            }
         }
          elseif ($manufacturer -contains "Dell"){
             Write-Host "[*] Downloading Dell Command" -ForegroundColor Yellow

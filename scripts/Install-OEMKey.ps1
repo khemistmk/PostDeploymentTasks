@@ -25,11 +25,11 @@ Function Install-OEMKey {
             Write-Host "[*] Windows not yet activated." -ForegroundColor Yellow
             Write-Host "[*] Activating Windows..." -ForegroundColor Yellow
             try {
-            $licensestatus.InstallProductKey($OEMproductkey)
-            $licensestatus.RefeshLicenseStatus()
-            if ($licensestatus.LicenseStatus -eq 1){
-                Write-Host "Windows is Permanently Activated" -ForegroundColor Green
-            }
+                cscript C:\Windows\System32\slmgr.vbs /ipk $OEMproductkey | Out-Null
+                cscript C:\Windows\System32\slmgr.vbs /ato | Out-Null
+                if ($licensestatus.LicenseStatus -eq 1){
+                    Write-Host "[*] Windows is Permanently Activated" -ForegroundColor Green
+                }
             }
             catch {
                 Write-Error -Message "[*] Windows failed to activate." 

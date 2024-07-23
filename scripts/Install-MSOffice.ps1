@@ -22,19 +22,38 @@ Function Install-MSOffice {
             'O365-32' {$config = "Configuration-Office365Business32.xml"}
             'OHBE21' {$config = "Configuration-OfficeHBE2021.xml"}
         }
-    }
+        $officeupdatepath = "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
+        }
 
     process {
-        
+        if (Test-Path -Path $officeupdatepath){}
         try {
             $officefolder = "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\"
             Set-Location -Path "$officefolder"
             Write-Host "[*] Installing Office..." -ForegroundColor Yellow
-            Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
+            Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -PassThru
+            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                Start-Sleep -Milliseconds 100
+                if ($process.HasExited) {
+                Write-Progress -Activity "Installer" -Completed
+                break
+                }
+            }
             Set-Location -Path $PSscriptroot
-            $officeinstalled = Test-Path -Path "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
-            if ($officeinstalled -eq "True") {
+            $officeupdater = "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
+            if (Test-Path -Path $officeupdater) {
                 Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
+                Write-Host "[*] Checking for Microsoftr Office Updates..."
+                $process = Start-Process -FilePath $officeupdater - -ArgumentList "/update","User" -PassThru
+                for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
+                    Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                    Start-Sleep -Milliseconds 100
+                    if ($process.HasExited) {
+                    Write-Progress -Activity "Installer" -Completed
+                    break
+                    }
+                }
             }
             else {
                 Write-Error "[*] Microsoft Office Failed to install."
