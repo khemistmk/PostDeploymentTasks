@@ -47,10 +47,10 @@ Function Install-MSOffice {
                 Write-Host "[*] Checking for Microsoftr Office Updates..."
                 $process = Start-Process -FilePath $officeupdater - -ArgumentList "/update","User" -PassThru
                 for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
-                    Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
+                    Write-Progress -Activity "Office Updates" -PercentComplete $i -Status "Installing..."
                     Start-Sleep -Milliseconds 100
                     if ($process.HasExited) {
-                    Write-Progress -Activity "Installer" -Completed
+                    Write-Progress -Activity "Office Updates" -Completed
                     break
                     }
                 }
