@@ -19,6 +19,8 @@ function Invoke-PostDeploymentTasks {
     )
 
     begin {
+        $deploystart = Get-Date
+        $processTimer = [System.Diagnostics.Stopwatch]::StartNew()
         Write-Host "[*] Installing Prerequisites..." -ForegroundColor Yellow
         Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
         $nuget = Get-PackageProvider | Where-Object {$_.Name -eq "NuGet"}
@@ -66,9 +68,18 @@ function Invoke-PostDeploymentTasks {
     }
 
     end {
+         $processTimer.Stop()
+         $Deployend = Get-Date
          if ($Host.Name -eq "ConsoleHost") {
             Clear-Host
             Get-SystemStatus -SaveLocation $SaveLocation
+
+            $ts = $processTimer.Elapsed
+$elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $ts.Hours, $ts.Minutes, $ts.Seconds, ($ts.Milliseconds / 10)
+            Write-Host "[*] Deployment Completed in $elapsedtime." ForegroundColor Green 
+            Write-Host "Deployment started at $deploystart"
+            Write-Host "Deployment completed at $deployend"
+            Deployment to
             Write-Host "Press any key to continue..."
             $Host.UI.RawUI.FlushInputBuffer()
             $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
