@@ -162,7 +162,7 @@ $compinfo = [PSCustomObject]@{
      Graphics     = $graphics
 }
 
-    <#    $Report = @"
+    <#    $Report = 
 
 Deployment Date:            $date
 Customer Name:              $CustomerName ($Username)
@@ -216,7 +216,7 @@ Power Options:
 Installed Software
 _____________________________________________________________
 $plist
-"@
+
 
 Clear-Host
 $Report > "$SaveLocation\$Computername-SystemStatus.txt"
