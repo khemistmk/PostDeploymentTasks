@@ -1,4 +1,4 @@
-function Get-SystemStatus {
+function Get-SystemProfile {
     <#
     .SYNOPSIS 
         This script will disable the default Administrator account.
