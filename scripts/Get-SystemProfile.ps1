@@ -15,6 +15,12 @@ function Get-SystemProfile {
         [switch]$Hardware,
 
         [Parameter()]
+        $RAMDetails,
+
+        [Parameter()]
+        $DriveDetails,
+
+        [Parameter()]
         [switch]$OperatingSystem,
 
         [Parameter()]
@@ -46,7 +52,8 @@ function Get-SystemProfile {
         $drivebrand,$driveserial = $Drivemanufacturer -split " "
         $Drivetype = Get-PhysicalDisk | Select-Object -ExpandProperty MediaType
         $Bustype = Get-PhysicalDisk | Select-Object -ExpandProperty Bustype
-        $graphics = (Get-CimInstance -ClassName Win32_VideoController).Description
+        $graphic = (Get-CimInstance -ClassName Win32_VideoController).Description
+        $graphiclist = $graphic -split "{" -split "}"
         $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
         $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
         $fsName = "HiberbootEnabled"
@@ -59,7 +66,8 @@ function Get-SystemProfile {
         $ramchannel = $RAMinfo.InterleaveDataDepth
         $Programlist = Get-Package |
             Where-Object {($_.ProviderName -Like "Programs") -and ($_.Name -notLike "*Visual C++*")} |
-            Select-Object -Property Name,Version
+            Select-Object -Property Name,Version |
+            Sort-Object -Property Name | Format-Table
             }
     process {
         if ($licensestatus.LicenseStatus -eq 1){
@@ -69,7 +77,7 @@ function Get-SystemProfile {
         if (($drivesize -gt "469") -and ($drivesize -lt "479")) { $Drive = "512 GB"}
         if (($drivesize -gt "929") -and ($drivesize -lt "1024")) { $Drive = "1 TB"}
         if (($drivesize -gt "1800") -and ($drivesize -lt "2048")) { $Drive = "2 TB"}
-        if ($Admin -eq "False") {
+        if (!$Admin) {
             $Adminstatus = "Disabled"
         }
         else {
@@ -124,10 +132,17 @@ function Get-SystemProfile {
         }
         $Hardwareinfo = [PSCustomObject]@{
             CPU                 =   $CPUInfo
-            RAMinfo             =   "$RAM + 'GB'"
-            Drive               =   $Drive + $drivebrand + $Bustype + $Drivetype
-            Graphics            =   $graphics
+            RAM                 =   "$RAM GB"
+            Drive               =   "$Drive $drivebrand $Bustype $Drivetype"
+            Graphics            =   $graphiclist
         }
+        $DriveInformation = [PSCustomObject]@{
+            Size                =   $Drive
+            Manufacturer        =   $drivebrand
+            BusType             =   $Bustype
+            DriveType           =   $Drivetype
+        }
+      
         $CommonSetinfo = [PSCustomObject]@{
             Bitlocker           =   $bit
             Administrator       =   $Adminstatus
@@ -135,31 +150,61 @@ function Get-SystemProfile {
             FastStartup         =   $faststart
         }
         $Powerinfo = [PSCustomObject]@{
-            MonTimeoutDC       =    "$montimeoutdc + ' Min'"
-            MonTimeoutAC       =    "$montimeoutac + ' Min'"
-            SleepTimeoutDC     =    "$sleeptimeoutdc + ' Min'"
-            SleepTimeoutAC     =    "$sleeptimeoutac + ' Min'"
+            MonitorTimeoutDC    =   "$montimeoutdc Min"
+            MonitorTimeoutAC    =   "$montimeoutac Min"
+            SleepTimeoutDC      =   "$sleeptimeoutdc Min"
+            SleepTimeoutAC      =   "$sleeptimeoutac Min"
+        }
+
+        $AllInfo = [PSCustomObject]@{
+            WindowsVerson       =   $winver
+            WindowsActivation   =   $winactivation
+            Manufacturer        =   $Man
+            Model               =   $model
+            ComputerName        =   $computername
+            SerialNumber        =   $serialnumber
+            CPU                 =   $CPUInfo
+            RAM                 =   "$RAM GB"
+            Drive               =   "$Drive $drivebrand $Bustype $Drivetype"
+            Graphics            =   $graphiclist
+            Bitlocker           =   $bit
+            Administrator       =   $Adminstatus
+            Dotnet3             =   $dotnet
+            FastStartup         =   $faststart
+            MonitorTimeoutDC    =   "$montimeoutdc Min"
+            MonitorTimeoutAC    =   "$montimeoutac Min"
+            SleepTimeoutDC      =   "$sleeptimeoutdc Min"
+            SleepTimeoutAC      =   "$sleeptimeoutac Min"
+            
+
         }
         if ($Manufacturer) {
-            $Maninfo
+            Write-Output -InputObject  $Maninfo
         }
         if ($Hardware) {
-            $Hardwareinfo
+            Write-Output -InputObject  $Hardwareinfo
+        }
+        if ($RAMDetails) {
+            Write-Output -InputObject  $RAMInformation
+        }
+        if ($DriveDetails) {
+            Write-Output -InputObject  $DriveInformation
         }
         if ($OperatingSystem) {
-            $OSinfo
+            Write-Output -InputObject  $OSinfo
         }
         if ($Programs) {
-            $Programlist
+            Write-Output -InputObject  $Programlist
         }
         if ($CommonSettings) {
-            $CommonSetinfo
+            Write-Output -InputObject  $CommonSetinfo
         }
         if ($PowerSettings) {
-            $Powerinfo
+            Write-Output -InputObject  $Powerinfo
         }
         if ($All) {
-            Write-Output-InputObject  $Maninfo,$Hardwareinfo,$OSinfo,$CommonSettings,$Powerinfo,$Programlist
+            Write-Output -InputObject $AllInfo
+            Write-Output -InputObject $Programlist  
         }
     }
     end {
