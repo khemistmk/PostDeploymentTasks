@@ -153,16 +153,8 @@ function Get-SystemStatus {
         Select-Object -Last 2 -Skip 1 |
         Foreach-Object {($_.Split(':')[1]) /60}
 
-$compinfo = [PSCustomObject]@{
-     Manufacturer = $manufacturer
-     Model.       = $model
-     CPU          = $CPUInfo
-     Total RAM    = $RAM 
-     Drive        = $Drive                     
-     Graphics     = $graphics
-}
 
-    <#    $Report = 
+    $Report = @"
 
 Deployment Date:            $date
 Customer Name:              $CustomerName ($Username)
@@ -216,15 +208,11 @@ Power Options:
 Installed Software
 _____________________________________________________________
 $plist
-
+"@
 
 Clear-Host
 $Report > "$SaveLocation\$Computername-SystemStatus.txt"
 Write-Host "$Report"
-
-#>
-
-Write-Output $compinfo
 
     }
     end {
