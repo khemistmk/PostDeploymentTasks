@@ -21,7 +21,13 @@ function Get-SystemStatus {
         [switch]$Programs,
 
         [Parameter()]
-        [switch]
+        [switch]$CommonSettings,
+
+        [Parameter()]
+        [switch]$PowerSettings,
+
+        [Parameter()]
+        [switch]$All
 
     )
 
@@ -30,10 +36,8 @@ function Get-SystemStatus {
         $computername = (Get-WmiObject -Class Win32_Operatingsystem).PSComputerName
         $winver = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
         $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
-        $PDFVersion = (Get-Package | Where-Object {($_.Name -like "*Adobe Acrobat*") -or ($_.Name -like "*Foxit*")}).Name
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
-        $MSOfficevers = @((Get-Package | Where-Object {($_.Name -like "*Microsoft Office*") -or ($_.Name -like "*Microsoft 365*") -and ($_.Name -notlike "*Teams*")}).Name)
-        $manufacturer = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
+        $man = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
         $model = (Get-CimInstance -Namespace root\wmi -ClassName MS_SystemInformation).SystemVersion
         $CPUInfo = (Get-CimInstance Win32_Processor).name
         $RAM = Get-CimInstance win32_ComputerSystem | ForEach-Object {[math]::round($_.TotalPhysicalMemory /1GB)}
@@ -43,11 +47,6 @@ function Get-SystemStatus {
         $Drivetype = Get-PhysicalDisk | Select-Object -ExpandProperty MediaType
         $Bustype = Get-PhysicalDisk | Select-Object -ExpandProperty Bustype
         $graphics = (Get-CimInstance -ClassName Win32_VideoController).Description
-        $OEM =  Get-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\OEMInformation" | Select-Object -Property Manufacturer,SupportHours,SupportPhone,SupportURL
-        $oemman = $OEM.Manufacturer
-        $oemhours = $OEM.SupportHours
-        $oemphone = $OEM.SupportPhone
-        $oemurl = $OEM.SupportURL
         $dotnet3 = (Get-ChildItem -Path 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name 'Version' -ErrorAction SilentlyContinue | ForEach-Object {$_.Version -as [System.Version]} | Where-Object {$_.Major -eq 3 -and $_.Minor -eq 5}).Count -ge 1
         $fsPath = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"
         $fsName = "HiberbootEnabled"
@@ -58,6 +57,9 @@ function Get-SystemStatus {
         $ramloc = $RAMinfo.DeviceLocator
         $ramspeed = $RAMinfo.Speed
         $ramchannel = $RAMinfo.InterleaveDataDepth
+        $Programlist = Get-Package |
+            Where-Object {($_.ProviderName -Like "Programs") -and ($_.Name -notLike "*Visual C++*")} |
+            Select-Object -Property Name,Version
             }
     process {
         if ($licensestatus.LicenseStatus -eq 1){
@@ -67,13 +69,6 @@ function Get-SystemStatus {
         if (($drivesize -gt "469") -and ($drivesize -lt "479")) { $Drive = "512 GB"}
         if (($drivesize -gt "929") -and ($drivesize -lt "1024")) { $Drive = "1 TB"}
         if (($drivesize -gt "1800") -and ($drivesize -lt "2048")) { $Drive = "2 TB"}
-
-        $Programs = @()
-        $Programlist = "Adobe Acrobat","Reader","Foxit","Microsoft Office","Microsoft 365","Project","AutoDesk","Navisworks","VLC","Chrome","Firefox","Sophos","7-Zip"
-        foreach ($p in $Programlist) {
-            $Programs += (Get-Package | Where-Object {$_.Name -like "*$p*"}).Name
-        }
-        $plist = $Programs | Out-String
         if ($Admin -eq "False") {
             $Adminstatus = "Disabled"
         }
@@ -85,18 +80,6 @@ function Get-SystemStatus {
         }
         else {
             $bit = "Disabled"
-        }
-        if (!(Test-Path "C:\Platform")) {
-            $platform = "Removed"
-        }
-        else {
-            $platform = "Not Removed"
-        }
-        if (!(Test-Path "C:\OEM")) { 
-            $oemfolder = "Removed"
-        }
-        else {
-            $oemfolder = "Not Removed"
         }
         if ($dotnet3 -eq 'True') {
             $dotnet = "Enabled"
@@ -110,27 +93,7 @@ function Get-SystemStatus {
         else {
             $faststart = "Enabled"
         }
-        if ($null -eq (Get-Package | Where-Object {$_.Name -like "*SmartDeploy*"})) {
-            $SmartDeploy = "Removed"
-        }
-        else {
-            $SmartDeploy = "Not Removed"
-        }
-        $ramchan = @()
-        foreach ($r in $ramchannel){
-            if ($r -eq "2") {
-                $ramchan += "Dual Channel"
-            }
-            else {
-                $_ = "Single Channel"
-            }
-        }
-
-        $RAM1 = $ramcap[0],"GB",$ramman[0],$ramspeed[0],"GHz", $ramchan[0],$ramloc[0]
-        $RAM2 = $ramcap[1],"GB",$ramman[1],$ramspeed[1],"GHz", $ramchan[0],$ramloc[1]
-        $RAM3 = $ramcap[2],"GB",$ramman[2],$ramspeed[2],"GHz", $ramchan[0],$ramloc[2]
-        $RAM4 = $ramcap[3],"GB",$ramman[3],$ramspeed[3],"GHz", $ramchan[0],$ramloc[3]
-
+        
         $montimeoutac,$montimeoutdc = powercfg @(
             '/query'
             'scheme_current'
@@ -149,67 +112,60 @@ function Get-SystemStatus {
         Select-Object -Last 2 -Skip 1 |
         Foreach-Object {($_.Split(':')[1]) /60}
 
-
-    $Report = @"
-
-Deployment Date:            $date
-Customer Name:              $CustomerName ($Username)
-Serial Number:              $SerialNumber
-Computer Name:              $computername
-
-**************************************************************
-Activation Information
-Windows Version:            $winver
-Windows Activation:         $winactivation
-$PDFVersion                 $PDFkey
-$MSOfficevers               $MSOfficeVoucher
-$MSOfficeActivationEmail
-
-Hardware Information
-**************************************************************
-Manufacturer:               $manufacturer
-Model:                      $model
-CPU:                        $CPUInfo
-Ram Info:
-            Total RAM:      $RAM GB
-                            $RAM1
-                            $RAM2
-                            $RAM3
-                            $RAM4
-Drive:                      $Drive $drivebrand $Bustype $Drivetype                           
-Graphics:                   $graphics
-
-Deployment Tasks
-**************************************************************
-OEM Info:   
-            Manufacturer:   $oemman
-            Support Hours:  $oemhours
-            Support Phone:  $oemphone
-            Support URL:    $oemurl 
-
-Bitlocker:                  $bit
-Platform folder:            $platform
-OEM folder:                 $OEMfolder
-Administrator:              $Adminstatus
-Dotnet 3.5:                 $dotnet
-Fast Startup:               $faststart
-SmartDeploy:                $SmartDeploy
-
-Power Options:  
-    Monitor Timeout Battery:    $montimeoutdc Minutes
-    Monitor Timeout Plugged in: $montimeoutac Minutes
-    Sleep Timeout Battery:      $sleeptimeoutdc Minutes
-    Sleep Timeout Plugged in:   $sleeptimeoutac Minutes 
-
-Installed Software
-_____________________________________________________________
-$plist
-"@
-
-Clear-Host
-$Report > "$SaveLocation\$Computername-SystemStatus.txt"
-Write-Host "$Report"
-
+        $OSinfo = [PSCustomObject]@{
+            WindowsVerson       =   $winver
+            WindowsActivation   =   $winactivation
+        }
+        $Maninfo = [PSCustomObject]@{
+            Manufacturer        =   $Man
+            Model               =   $model
+            ComputerName        =   $computername
+            SerialNumber        =   $serialnumber
+        }
+        $Hardwareinfo = [PSCustomObject]@{
+            CPU                 =   $CPUInfo
+            RAMinfo             =   "$RAM + 'GB'"
+            Drive               =   $Drive + $drivebrand + $Bustype + $Drivetype
+            Graphics            =   $graphics
+        }
+        $CommonSetinfo = [PSCustomObject]@{
+            Bitlocker           =   $bit
+            Administrator       =   $Adminstatus
+            Dotnet3             =   $dotnet
+            FastStartup         =   $faststart
+        }
+        $Powerinfo = [PSCustomObject]@{
+            MonTimeoutDC       =    "$montimeoutdc + ' Min'"
+            MonTimeoutAC       =    "$montimeoutac + ' Min'"
+            SleepTimeoutDC     =    "$sleeptimeoutdc + ' Min'"
+            SleepTimeoutAC     =    "$sleeptimeoutac + ' Min'"
+        }
+        if ($Manufacturer) {
+            $Maninfo
+        }
+        if ($Hardware) {
+            $Hardwareinfo
+        }
+        if ($OperatingSystem) {
+            $OSinfo
+        }
+        if ($Programs) {
+            $Programlist
+        }
+        if ($CommonSettings) {
+            $CommonSetinfo
+        }
+        if ($PowerSettings) {
+            $Powerinfo
+        }
+        if ($All) {
+            $Maninfo
+            $Hardwareinfo
+            $OSinfo
+            $CommonSettings
+            $Powerinfo
+            $Programlist
+        }
     }
     end {
 
