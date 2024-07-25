@@ -159,12 +159,7 @@ function Get-SystemStatus {
             $Powerinfo
         }
         if ($All) {
-            $Maninfo
-            $Hardwareinfo
-            $OSinfo
-            $CommonSettings
-            $Powerinfo
-            $Programlist
+            Write-Output-InputObject  $Maninfo,$Hardwareinfo,$OSinfo,$CommonSettings,$Powerinfo,$Programlist
         }
     }
     end {
