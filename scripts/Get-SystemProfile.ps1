@@ -15,10 +15,10 @@ function Get-SystemProfile {
         [switch]$Hardware,
 
         [Parameter()]
-        $RAMDetails,
+        [switch]$RAMDetails,
 
         [Parameter()]
-        $DriveDetails,
+        [switch]$DriveDetails,
 
         [Parameter()]
         [switch]$OperatingSystem,
