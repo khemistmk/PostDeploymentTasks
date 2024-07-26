@@ -41,6 +41,7 @@ function Get-SystemProfile {
         $serialnumber = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
         $computername = (Get-WmiObject -Class Win32_Operatingsystem).PSComputerName
         $winver = (Get-CimInstance -ClassName Win32_OperatingSystem).Caption
+        $Winbuild = (Get-Item "HKLM:SOFTWARE\Microsoft\Windows NT\CurrentVersion").GetValue('DisplayVersion')
         $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
         $Admin = (Get-LocalUser -Name "Administrator").Enabled
         $man = (Get-CimInstance -ClassName Win32_ComputerSystem).manufacturer
@@ -122,6 +123,7 @@ function Get-SystemProfile {
 
         $OSinfo = [PSCustomObject]@{
             WindowsVerson       =   $winver
+            BuildVersion        =  $winbuild
             WindowsActivation   =   $winactivation
         }
         $Maninfo = [PSCustomObject]@{
@@ -159,6 +161,7 @@ function Get-SystemProfile {
         $AllInfo = [PSCustomObject]@{
             WindowsVerson       =   $winver
             WindowsActivation   =   $winactivation
+            BuildVersion        =   $Winbuild
             Manufacturer        =   $Man
             Model               =   $model
             ComputerName        =   $computername
