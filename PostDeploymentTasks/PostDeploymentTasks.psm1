@@ -1,4 +1,4 @@
-$Scripts = @(Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath "\scripts\*.ps1") -ErrorAction SilentlyContinue)
+$Scripts = @(Get-ChildItem -Path (Join-Path -Path $PSScriptRoot -ChildPath "\Public\*.ps1") -ErrorAction SilentlyContinue)
 
 foreach ($Import in $Scripts) {
     try {
