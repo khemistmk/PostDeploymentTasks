@@ -105,7 +105,7 @@ Set-BitlockerDrive -SaveLocation "$env:Userprofile\Documents" -Filename $env:com
 
 ## Set-DefaultApps
 ```Powershell
-Set-DefaultApps -OEM "C:\OEM" -Platform "C:\Platform"
+Set-DefaultApps
 ```
 
 ## Set-DotNet
@@ -120,5 +120,5 @@ Set-PowerOptions -montimeoutac 60 -montimeoutdc 30 -sbtimeoutac 0 -sbtimeoutdc 0
 
 ## Uninstall-Package
 ```Powershell
-Uninstall-Package -PackageName SmartDeploy
+Uninstall-Package -PackageName McAfee
 ```
