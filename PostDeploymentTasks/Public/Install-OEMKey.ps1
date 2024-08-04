@@ -13,30 +13,33 @@ Function Install-OEMKey {
     }
 
     process {
-        Write-Host "[*] Checking Windows Activation..." -ForegroundColor Yellow
+        Write-Verbose "Checking Windows Activation..."
         #Get OEM Product key from bios
         $OEMproductkey = (Get-WmiObject -Class SoftwareLicensingService).OA3xOriginalProductKey
         #Get Windows licensing status
         $licensestatus = Get-CimInstance -ClassName SoftwareLicensingProduct -Filter "PartialProductKey IS NOT NULL" | Where-Object -Property Name -Like "Windows*"
         if ($licensestatus.LicenseStatus -eq 1){
-            Write-Host "[*] Windows is  Activated" -ForegroundColor Green
+            Write-Host "Windows is activated."
         }
         else {
-            Write-Host "[*] Windows not yet activated." -ForegroundColor Yellow
-            Write-Host "[*] Activating Windows..." -ForegroundColor Yellow
+            Write-Verbose "Windows not yet activated."
             try {
+                Write-Verbose "Activating Windows..."
                 cscript C:\Windows\System32\slmgr.vbs /ipk $OEMproductkey | Out-Null
                 cscript C:\Windows\System32\slmgr.vbs /ato | Out-Null
                 if ($licensestatus.LicenseStatus -eq 1){
-                    Write-Host "[*] Windows is Permanently Activated" -ForegroundColor Green
+                    Write-Host "Windows is Activated"
                 }
             }
             catch {
-                Write-Error -Message "[*] Windows failed to activate." 
+                Write-Error -Message "Windows failed to activate." 
             }
+        }
+        $ProductKey = [PSCustomObject]@{
+            ProductKey = $OEMproductkey
         }
     }
     end {
-
+        Write-Output -InputObject $ProductKey
     }
 }

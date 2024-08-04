@@ -12,57 +12,43 @@ Function Install-MSOffice {
     [CmdletBinding()]
     param (
         [Parameter()]
-        [ValidateSet("O365","O365-32","OHBE21","OHBE21-32","OHBE19","OHBE19-32")]
+        [ValidateSet("O365","O365-32","OHBE21","OHBE21-32")]
         [string]$officevers
     )
 
     begin {
         switch ($officevers) {
             'O365'{ $config = "Configuration-Office365Business.xml"}
-            'O365-32' {$config = "Configuration-Office365Business32.xml"}
+            'O365-32' {$config = "Configuration-Office365Business-32bit.xml"}
             'OHBE21' {$config = "Configuration-OfficeHBE2021.xml"}
+            'OHBE21-32' {$config = "Configuration-OfficeHBE2021-32bit.xml"}
         }
         $officeupdatepath = "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
         }
 
     process {
-        if (Test-Path -Path $officeupdatepath){}
-        try {
-            $officefolder = "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\"
-            Set-Location -Path "$officefolder"
-            Write-Host "[*] Installing Office..." -ForegroundColor Yellow
-            Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -PassThru
-            for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
-                Write-Progress -Activity "Installer" -PercentComplete $i -Status "Installing"
-                Start-Sleep -Milliseconds 100
-                if ($process.HasExited) {
-                Write-Progress -Activity "Installer" -Completed
-                break
-                }
+        if (!(Test-Path -Path $officeupdatepath)){
+            try {
+                $officefolder = "$((Get-Item $PSScriptRoot).Parent.FullName)\Assets\"
+                Set-Location -Path $officefolder
+                Write-Verbose -Message "Installing Office..."
+                Start-Process -FilePath "Setup.exe" -ArgumentList "/Configure $config" -Wait
+                Set-Location -Path $PSscriptroot    
             }
-            Set-Location -Path $PSscriptroot
-            $officeupdater = "C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeC2RClient.exe"
-            if (Test-Path -Path $officeupdater) {
-                Write-Host "[*] Microsoft Office Installed Successfully." -ForegroundColor Green
-                Write-Host "[*] Checking for Microsoftr Office Updates..."
-                $process = Start-Process -FilePath $officeupdater - -ArgumentList "/update","User" -PassThru
-                for($i = 0; $i -le 100; $i = ($i + 1) % 100) {
-                    Write-Progress -Activity "Office Updates" -PercentComplete $i -Status "Installing..."
-                    Start-Sleep -Milliseconds 100
-                    if ($process.HasExited) {
-                    Write-Progress -Activity "Office Updates" -Completed
-                    break
-                    }
-                }
+            catch {
+                Write-Error -Message "Failed to install Microsoft Office"
             }
-            else {
-                Write-Error "[*] Microsoft Office Failed to install."
-            }  
         }
-        catch {
-            Write-Error "[*] Microsoft Office Failed to install."
+        if (Test-Path -Path $officeupdatepath) {
+            Write-Verbose "Microsoft Office Installed." 
+            try {
+                Write-Verbose "Checking for Microsoftr Office Updates..."
+                Start-Process -FilePath $officeupdater - -ArgumentList "/update","User" -Wait    
+            }
+            catch {
+                Write-Error "[*] Failed to update Microsoft Office."
+            }
         }
-     
     }
     end {
 

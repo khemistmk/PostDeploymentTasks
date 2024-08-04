@@ -15,10 +15,10 @@ function Install-WindowsUpdates {
     
     process {
         try {
-            Write-Host "[*] Checking for Windows Updates..." -ForegroundColor Yellow
+            Write-Verbose "Checking for Windows Updates..."
             usoclient ScanInstallWait
             usoclient StartInstall
-            Write-Host "[*] Windows Updates Completed" -ForegroundColor Green
+            Write-Verbose "[*] Windows Updates Completed"
         }
         catch {
             Write-Error -message "[*] Unable to run Windows Updates"

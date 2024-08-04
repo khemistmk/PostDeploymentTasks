@@ -22,19 +22,19 @@ Function Install-StandardApps {
     process {
         foreach ($a in $applist) {
             if ($a -eq "7zip") {
-               Write-Host "[*] Installing $a ..." -Foregroundcolor Yellow
+               Write-Verbose "Installing $a ..." -Foregroundcolor Yellow
                $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
                    Select-Object -ExpandProperty Links | 
                    Where-Object {($_.href -like "a/*") -and ($_.href -like "*-x64.exe")} |
                    Select-Object -ExpandProperty href)
                Invoke-WebRequest $webLocation -OutFile $TemporaryDownloadFile
                Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
-               Write-Host "[*] $a Installed." -Foregroundcolor Green
+               Write-Verbose " $a Installed." -Foregroundcolor Green
             }
             else {
-                Write-Host "[*] Installing $a ..." -Foregroundcolor Yellow
+                Write-Verbose "Installing $a ..." -Foregroundcolor Yellow
                 winget install -e --id $a --silent --accept-source-agreements --accept-package-agreements
-                Write-Host "[*] $a Installed." -Foregroundcolor Green
+                Write-Verbose "$a Installed." -Foregroundcolor Green
             }
         }
     }

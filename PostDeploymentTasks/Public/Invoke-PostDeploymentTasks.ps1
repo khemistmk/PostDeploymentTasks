@@ -13,9 +13,15 @@ function Invoke-PostDeploymentTasks {
         
         [Parameter()] 
         [string]$InstallPDFVers,
+
+        [Parameter()]
+        [string]$Uninstallpackage,
     
         [Parameter()]
-        [string]$SaveLocation
+        [string]$SaveLocation = "$env:USERPROFILE\Documents",
+
+        [Parameter()]
+        [switch]$NoRestart
     )
 
     begin {
@@ -48,32 +54,34 @@ function Invoke-PostDeploymentTasks {
             Disable-Administrator
             Set-PowerOptions
             Remove-DeploymentFiles
-            Set-DotNet -setdotnet3 Enabled -setdotnet4 Enabled
-            Uninstall-Package -PackageName "SmartDeploy"
+            Remove-Bloat
+            Set-DefaultApps
+            Set-DotNet
             Install-StandardApps
             Install-SystemUpdate
             Install-WindowsUpdates
             Set-BitlockerDrive -SaveLocation $SaveLocation
         }
         Invoke-Defaultdeploy
+        if ($Uninstallpackage) {
+            Uninstall-Package -PackageName $Uninstallpackage
+        }
         if ($InstallOfficevers) {
-        Install-MSOffice -officevers $InstallOfficevers
+            Install-MSOffice -officevers $InstallOfficevers
         }
         if ($InstallPDFvers) {
-        Install-PDF -InstallPDFVers $InstallPDFVers
+            Install-PDF -InstallPDFVers $InstallPDFVers
         }
-        Remove-Bloat
-        Set-DefaultApps
+        
         
     }
 
     end {
-         $processTimer.Stop()
-         $Deployend = Get-Date
-         if ($Host.Name -eq "ConsoleHost") {
+        $processTimer.Stop()
+        $Deployend = Get-Date
+        if ($Host.Name -eq "ConsoleHost") {
             Clear-Host
-            Get-SystemStatus -SaveLocation $SaveLocation
-
+            Get-SystemProfile
             $ts = $processTimer.Elapsed
             $elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $ts.Hours, $ts.Minutes, $ts.Seconds, ($ts.Milliseconds / 10)
             Write-Host "[*] Deployment started at $deploystart" -ForegroundColor Green
@@ -83,10 +91,11 @@ function Invoke-PostDeploymentTasks {
             $Host.UI.RawUI.FlushInputBuffer()
             $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyUp") > $null
          }
-       $WshShell = New-Object -comObject WScript. Shell
-     $WshShell.RegWrite('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\InstallAtShutdown', '1', 'REG_DWORD')
-
-       Restart-Computer
+        $WshShell = New-Object -comObject WScript. Shell
+        $WshShell.RegWrite('HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\InstallAtShutdown', '1', 'REG_DWORD')
+        if (!$NoRestart) {
+            Restart-Computer
+        }
     }
 
 }
