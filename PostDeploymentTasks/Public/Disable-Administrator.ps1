@@ -6,27 +6,28 @@ function Disable-Administrator {
         This script will check if the default Administrator account is enabled and if so, disable it.
 
 #>
-    [CmdletBinding()]
+    [CmdletBinding(SupportsShouldProcess)]
     param (
-        
+        [Parameter()]
+        [string]$adminaccount = (Get-LocalUser -Name "Administrator")
     )
 
     begin {   
-        $adminaccount = Get-LocalUser -Name "Administrator"
+        
     }
     
     process {
-        Write-Host "[*] Checking default Administrator Account..." -ForegroundColor Yellow
+        Write-Verbose "Checking default Administrator Account..." 
         if ($adminaccount.Enabled -eq "False") {
-            Write-Host "[*] Administrator account disabled." -ForegroundColor Yellow
+            Write-Verbose "Administrator account disabled." 
         }
         else {
-            Write-Host "[*] Disabling default Administrator Account..."-ForegroundColor Yellow
+            Write-Verbose "Disabling default Administrator Account..."
             Disable-LocalUser -Name "Administrator"
-            Write-Host "[*] Administrator account disabled." -ForegroundColor Green
+            Write-Verbose "Administrator account disabled."
         }
     }
     end {
-
+        $adminaccount
     }
 }

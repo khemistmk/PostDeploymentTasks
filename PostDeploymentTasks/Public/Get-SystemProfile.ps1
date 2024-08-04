@@ -68,7 +68,7 @@ function Get-SystemProfile {
         $Programlist = Get-Package |
             Where-Object {($_.ProviderName -Like "Programs") -and ($_.Name -notLike "*Visual C++*")} |
             Select-Object -Property Name,Version |
-            Sort-Object -Property Name | Format-Table
+            Sort-Object -Property Name
             }
     process {
         if ($licensestatus.LicenseStatus -eq 1){
@@ -206,8 +206,7 @@ function Get-SystemProfile {
             Write-Output -InputObject  $Powerinfo
         }
         if ($All) {
-            Write-Output -InputObject $AllInfo
-            Write-Output -InputObject $Programlist  
+            Write-Output -InputObject $AllInfo,$Programlist
         }
     }
     end {
