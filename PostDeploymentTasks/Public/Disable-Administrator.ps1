@@ -9,11 +9,11 @@ function Disable-Administrator {
     [CmdletBinding(SupportsShouldProcess)]
     param (
         [Parameter()]
-        [string]$adminaccount = (Get-LocalUser -Name "Administrator")
+        [string]$AccountName = "Administrator"
     )
 
     begin {   
-        
+        $adminaccount = Get-LocalUser -Name $AccountName
     }
     
     process {
@@ -23,11 +23,11 @@ function Disable-Administrator {
         }
         else {
             Write-Verbose "Disabling default Administrator Account..."
-            Disable-LocalUser -Name "Administrator"
+            Disable-LocalUser -Name $AccountName
             Write-Verbose "Administrator account disabled."
         }
     }
     end {
-        $adminaccount
+        $adminaccount | Select-Object -Property Name,Enabled
     }
 }
