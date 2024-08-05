@@ -1,4 +1,4 @@
-function Set-DefaultApps {
+function Set-DefaultAppAssoc {
     <#
         .SYNOPSIS 
             This script will set the default apps for new users on a machine.
@@ -11,6 +11,7 @@ function Set-DefaultApps {
         )
     
         begin {
+
             $Programs = "C:\ProgramData\Microsoft\Windows\Start Menu\Programs"
             $Chrome = "Google Chrome.lnk"
             $AdobeReader = "Acrobat Reader.lnk"
@@ -29,12 +30,12 @@ function Set-DefaultApps {
             else { $PDF = "Chrome" }
             $config = "$Browser$Mail$PDF.xml"
             try {
-                Write-Host "[*] Setting Default Apps..." -ForegroundColor Yellow 
+                Write-Verbose "Setting default apps"
                 DISM /Online /Import-DefaultAppAssociations:$path\$config
-                Write-Host "[*] Default Apps set." -ForegroundColor Green
+                Write-Verbose "Default Apps set to $Browser$Mail$PDF"
             }
             catch {
-                Write-Error-message "[*] Unable to set Default Apps."
+                Write-Error-message "Unable to set Default Apps."
             }
         }
     

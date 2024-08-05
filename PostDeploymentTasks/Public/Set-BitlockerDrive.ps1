@@ -1,4 +1,4 @@
-function Set-BitlockerDrive {
+function Set-Bitlocker {
     <#
     .SYNOPSIS 
         This script will check if Bitlocker is enabled and, if not, enable it.
@@ -13,7 +13,10 @@ function Set-BitlockerDrive {
 #>
     [CmdletBinding()]
     param (
-        
+        [Parameter()]
+        [ValidateSet("Enabled","Disabled")]
+        [string]$Status = "Enabled",
+
         [Parameter()]
         $SaveLocation = "$env:USERPROFILE\Documents",
 
@@ -27,21 +30,33 @@ function Set-BitlockerDrive {
     
     process {
         #Checks if Bitlocker enabled, if not, enables and prints recovery password to file
-        Write-Host "[*] Checking Bitlocker status..." -ForegroundColor Yellow
-        if (((Get-BitLockerVolume -MountPoint "C:").VolumeStatus) -eq 'FullyEncrypted') {
-            Write-Host "[*] Bitlocker is already enabled for Drive C:" -ForegroundColor Green
-        }
-         else {
-            Write-Host "[*] Enabling bitlocker..." -ForegroundColor Yellow
-            Enable-BitLocker -MountPoint "C:" -RecoveryPasswordProtector -UsedSpaceOnly -SkipHardwareTest
-        }
-        $Bitlockerkey = (Get-BitLockerVolume -MountPoint "C:").KeyProtector |
-        Where-Object -Property KeyProtectorType -eq RecoveryPassword |
-        Select-Object -Property KeyProtectorID,RecoveryPassword 
-        $blid = $bitlockerkey.KeyProtectorID
-        $blid2 = $blid -split "{" -split "}"
-        $blpw = $bitlockerkey.RecoveryPassword
-        $bitlockerfile = 
+        switch ($status) {
+            'Enabled' {
+                Write-Verbose "Checking Bitlocker status."
+                $bitlockerstatus = (Get-BitLockerVolume -MountPoint "C:").VolumeStatus
+                if ( $bitlockerstatus -eq 'FullyEncrypted') {
+                    Write-Verbose "Bitlocker already Enabled." 
+                }
+                else {
+                    Write-Verbose "Enabling bitlocker for Volume C:"
+                    Enable-BitLocker -MountPoint C: -RecoveryPasswordProtector -UsedSpaceOnly -SkipHardwareTest
+                    do {
+                        $Volume = Get-BitLockerVolume -MountPoint C:
+                        Write-Progress -Activity "Encrypting volume $($Volume.MountPoint)" -Status "Encryption Progress:" -PercentComplete $Volume.EncryptionPercentage
+                        Start-Sleep -Seconds 1
+                    }
+                    until ($Volume.VolumeStatus -eq 'FullyEncrypted')
+                        Write-Verbose "Volume C: Fully Encrypted"
+                }
+                Write-Verbose "Checking Bitlocker status."
+                $bitlockerstatus = Get-BitLockerVolume -MountPoint "C:"
+                $Bitlockerkey = (Get-BitLockerVolume -MountPoint "C:").KeyProtector |
+                    Where-Object -Property KeyProtectorType -eq RecoveryPassword |
+                        Select-Object -Property KeyProtectorID,RecoveryPassword 
+                $blid = $bitlockerkey.KeyProtectorID
+                $blid2 = $blid -split "{" -split "}"
+                $blpw = $bitlockerkey.RecoveryPassword
+                $bitlockerfile = 
 @"
                 BitLocker Drive Encryption recovery key
 
@@ -65,11 +80,33 @@ function Set-BitlockerDrive {
         additional assistance.
 "@
     
-        $bitlockerfile> "$SaveLocation\$Filename-bitlocker.txt"
-        Write-Host "Bitlocker enabled. Bitlocker key is saved to $SaveLocation\$Filename-bitlocker.txt" -ForegroundColor Green
-        Write-Host "$Bitlockerkey" -ForegroundColor Yellow
+                $bitlockerfile | Out-File -Path "$SaveLocation\$Filename-bitlocker.txt"
+                Write-Host "Bitlocker enabled. Bitlocker key is saved to $SaveLocation\$Filename-bitlocker.txt"
+                Write-Host "$Bitlockerkey"
+            }
+            'Disabled' {
+                Write-Verbose "Checking Bitlocker status."
+                $bitlockerstatus = Get-BitLockerVolume -MountPoint "C:"
+                if ( $bitlockerstatus.VolumeStatus -eq 'FullyDecripted') {
+                    Write-Verbose "Bitlocker already disabled."
+                }
+                else {
+                    Write-Verbose "Disabling bitlocker for Volume C:"
+                    Disable-BitLocker -MountPoint "C:"
+                    do {
+                        $Volume = Get-BitLockerVolume -MountPoint C:
+                        Write-Progress -Activity "Decrypting volume $($Volume.MountPoint)" -Status "Decryption Progress:" -PercentComplete $Volume.EncryptionPercentage
+                        Start-Sleep -Seconds 1
+                    }
+                    until ($Volume.VolumeStatus -eq 'FullyDecrypted')
+                    Write-Verbose "Volume C: Fully Decrypted"
+                    
+                }
+            }
+        }
     }
     end {
-
+        $bitlockerstatus = Get-BitLockerVolume -MountPoint "C:"
+        Write-Output -InputObject $bitlockerstatus
     }
 }

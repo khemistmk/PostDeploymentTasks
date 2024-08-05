@@ -1,4 +1,4 @@
-function Invoke-PostDeploymentTasks {
+function Invoke-TaskSequence {
 <#
     .SYNOPSIS 
         This script automates the Post Deployment process.

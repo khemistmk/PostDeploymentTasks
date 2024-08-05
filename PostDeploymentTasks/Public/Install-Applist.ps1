@@ -21,6 +21,7 @@ Function Install-StandardApps {
 
     process {
         foreach ($a in $applist) {
+            #checks if 7zip and downloads installer
             if ($a -eq "7zip") {
                Write-Verbose "Installing $a ..." -Foregroundcolor Yellow
                $webLocation = $7zipWebsite + (Invoke-WebRequest -Uri $7zipWebsite | 
@@ -31,6 +32,7 @@ Function Install-StandardApps {
                Start-Process $TemporaryDownloadFile -ArgumentList "/S" -Wait
                Write-Verbose " $a Installed." -Foregroundcolor Green
             }
+            #installs via winget for all others
             else {
                 Write-Verbose "Installing $a ..." -Foregroundcolor Yellow
                 winget install -e --id $a --silent --accept-source-agreements --accept-package-agreements

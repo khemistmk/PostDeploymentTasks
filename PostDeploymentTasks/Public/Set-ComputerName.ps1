@@ -8,7 +8,8 @@ Function Set-ComputerName {
     #>
     [CmdletBinding()]
     param (
-    
+        [Parameter()]
+        [string]$ComputerSetName = (Get-WmiObject -Class Win32_BIOS | Select-Object -Property SerialNumber).serialnumber
     )
 
     begin {   
@@ -17,16 +18,20 @@ Function Set-ComputerName {
     }
 
     process {
-        Write-Host "[*] Setting Computer name..." -ForegroundColor Yellow
-        if ( $computername -eq $serialnumber ){
-        return
+        if ( $computername -eq $ComputerSetName ){
+            Write-Verbose "Computer name: $ComputerSetName"
         }
         else {
-        Rename-Computer -newname "$serialnumber"
+            Write-Verbose "Setting Computer name."
+            Rename-Computer -newname "$ComputerSetName"
+            Write-Verbose "Computer renamed to: $ComputerSetName"
         }
-        
+        $compinfo = [PSCustomObject]@{
+            ComputerName = $computername
+            SerialNumber = $serialnumber
+        }
     }
     end {
-        Write-Host "[*] Computer name set to $computername" -ForegroundColor Green
+        Write-Output -InputObject $compinfo
     }
 }
