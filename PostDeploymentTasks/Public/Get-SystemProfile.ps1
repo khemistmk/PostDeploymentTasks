@@ -138,6 +138,11 @@ function Get-SystemProfile {
             Drive               =   "$Drive $drivebrand $Bustype $Drivetype"
             Graphics            =   $graphiclist
         }
+
+        $Raminformation = [PSCustomObject]@{
+            Name = Value
+        }
+
         $DriveInformation = [PSCustomObject]@{
             Size                =   $Drive
             Manufacturer        =   $drivebrand
