@@ -34,9 +34,9 @@ Function Install-StandardApps {
             }
             #installs via winget for all others
             else {
-                Write-Verbose "Installing $a ..." -Foregroundcolor Yellow
+                Write-Verbose "Installing $a ..."
                 winget install -e --id $a --silent --accept-source-agreements --accept-package-agreements
-                Write-Verbose "$a Installed." -Foregroundcolor Green
+                Write-Verbose "$a Installed."
             }
         }
     }
